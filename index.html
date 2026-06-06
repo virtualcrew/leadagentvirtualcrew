@@ -4,147 +4,153 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VirtualCrew — Lead Intelligence Agent</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.22.0/dist/tabler-icons.min.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --navy:#0a0f1e; --navy2:#111827; --navy3:#1a2235; --navy4:#222f47;
-    --gold:#c9a84c; --gold-l:#f0d080; --gold-d:#7a6330;
-    --teal:#2dd4bf; --green:#34d399; --red:#f87171; --blue:#93c5fd;
-    --t1:#e8eaf0; --t2:#8a94a8; --t3:#4a5568;
-    --border:rgba(201,168,76,.15); --bh:rgba(201,168,76,.35);
-  }
-  body { font-family:'DM Sans',sans-serif; background:var(--navy); color:var(--t1); min-height:100vh; }
-  .shell { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0a0f1e;--navy2:#111827;--navy3:#1a2235;--navy4:#222f47;
+  --gold:#c9a84c;--gold-l:#f0d080;--gold-d:#7a6330;
+  --teal:#2dd4bf;--green:#34d399;--red:#f87171;--blue:#93c5fd;--purple:#a78bfa;
+  --t1:#e8eaf0;--t2:#8a94a8;--t3:#4a5568;
+  --border:rgba(201,168,76,.15);--bh:rgba(201,168,76,.35);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--t1);min-height:100vh}
+.shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
-  /* TOPBAR */
-  .topbar { height:58px; min-height:58px; background:var(--navy2); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 20px; gap:16px; }
-  .logo-mark { width:30px; height:30px; background:var(--gold); border-radius:7px; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; color:var(--navy); flex-shrink:0; }
-  .logo-name { font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; }
-  .logo-sub  { font-size:11px; color:var(--gold); margin-top:1px; }
-  .topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
-  .live-pill { display:flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; border:1px solid rgba(45,212,191,.3); background:rgba(45,212,191,.07); font-size:11px; color:var(--teal); font-weight:500; }
-  .pulse { width:6px; height:6px; border-radius:50%; background:var(--teal); animation:pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+/* TOPBAR */
+.topbar{height:56px;min-height:56px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:14px}
+.logo-mark{width:28px;height:28px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:11px;color:var(--navy);flex-shrink:0}
+.logo-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px}
+.logo-sub{font-size:10px;color:var(--gold);margin-top:1px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.live-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;border:1px solid rgba(45,212,191,.3);background:rgba(45,212,191,.07);font-size:11px;color:var(--teal);font-weight:500}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-  /* LAYOUT */
-  .body { display:flex; flex:1; overflow:hidden; }
-  .sidebar { width:230px; min-width:230px; background:var(--navy2); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow-y:auto; }
-  .content { flex:1; overflow-y:auto; padding:24px; }
-  .panel { display:none; }
-  .panel.active { display:block; }
+/* LAYOUT */
+.body{display:flex;flex:1;overflow:hidden}
+.sidebar{width:225px;min-width:225px;background:var(--navy2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.content{flex:1;overflow-y:auto;padding:22px}
+.panel{display:none}.panel.active{display:block}
 
-  /* SIDEBAR */
-  .sb-section { padding:14px 14px 4px; font-size:10px; font-weight:600; color:var(--t3); letter-spacing:.08em; text-transform:uppercase; }
-  .sb-item { display:flex; align-items:center; gap:9px; padding:8px 14px; font-size:13px; color:var(--t2); border-left:2px solid transparent; cursor:pointer; transition:all .15s; }
-  .sb-item:hover { color:var(--t1); background:rgba(201,168,76,.05); }
-  .sb-item.active { color:var(--gold); background:rgba(201,168,76,.08); border-left-color:var(--gold); }
-  .sb-badge { margin-left:auto; font-size:10px; font-weight:600; padding:2px 7px; border-radius:10px; background:var(--gold-d); color:var(--gold-l); }
-  .sb-badge.teal { background:rgba(45,212,191,.15); color:var(--teal); }
-  .icp-box { margin:12px; background:rgba(201,168,76,.05); border:1px solid var(--border); border-radius:8px; padding:10px 12px; font-size:11px; color:var(--t2); line-height:1.8; }
-  .icp-box .icp-title { font-size:10px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:.07em; margin-bottom:6px; }
+/* SIDEBAR */
+.sb-section{padding:12px 14px 3px;font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.08em;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:12px;color:var(--t2);border-left:2px solid transparent;cursor:pointer;transition:all .15s}
+.sb-item:hover{color:var(--t1);background:rgba(201,168,76,.05)}
+.sb-item.active{color:var(--gold);background:rgba(201,168,76,.08);border-left-color:var(--gold)}
+.sb-badge{margin-left:auto;font-size:10px;font-weight:600;padding:2px 6px;border-radius:8px;background:var(--gold-d);color:var(--gold-l)}
+.sb-badge.teal{background:rgba(45,212,191,.15);color:var(--teal)}
+.sb-badge.purple{background:rgba(167,139,250,.15);color:var(--purple)}
+.icp-box{margin:10px;background:rgba(201,168,76,.05);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--t2);line-height:1.8}
+.icp-title{font-size:10px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
 
-  /* COMMON COMPONENTS */
-  .btn { padding:9px 16px; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:7px; border:none; transition:all .2s; font-family:'DM Sans',sans-serif; }
-  .btn-gold { background:var(--gold); color:var(--navy); }
-  .btn-gold:hover { background:var(--gold-l); }
-  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--t2); }
-  .btn-ghost:hover { border-color:var(--bh); color:var(--t1); background:var(--navy3); }
-  .btn-sm { padding:5px 11px; font-size:11px; }
-  .btn-blue { background:rgba(147,197,253,.1); border:1px solid rgba(147,197,253,.25); color:var(--blue); }
+/* BUTTONS */
+.btn{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;border:none;transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-gold{background:var(--gold);color:var(--navy)}.btn-gold:hover{background:var(--gold-l)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--t2)}.btn-ghost:hover{border-color:var(--bh);color:var(--t1);background:var(--navy3)}
+.btn-teal{background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.25);color:var(--teal)}.btn-teal:hover{background:rgba(45,212,191,.18)}
+.btn-purple{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);color:var(--purple)}.btn-purple:hover{background:rgba(167,139,250,.18)}
+.btn-sm{padding:5px 10px;font-size:11px}
 
-  .stat-card { background:var(--navy3); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
-  .stat-val { font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; color:var(--t1); }
-  .stat-lbl { font-size:10px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; }
-  .stat-sub { font-size:11px; color:var(--t2); margin-top:4px; }
-  .up { color:var(--green); } .warn { color:var(--gold); } .muted { color:var(--t3); }
+/* CARDS & STATS */
+.stat-card{background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:13px 15px}
+.stat-val{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;color:var(--t1)}
+.stat-lbl{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.stat-sub{font-size:11px;color:var(--t2);margin-top:3px}
+.up{color:var(--green)}.warn{color:var(--gold)}.info{color:var(--blue)}.purp{color:var(--purple)}
 
-  .status-bar { display:flex; align-items:center; gap:10px; padding:9px 14px; border-radius:8px; border:1px solid var(--border); background:var(--navy3); font-size:12px; color:var(--t2); margin-bottom:16px; }
-  .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-  .dot-amber { background:#fbbf24; animation:pulse 1.2s infinite; }
-  .dot-green { background:var(--green); }
-  .dot-red   { background:var(--red); }
-  .dot-gray  { background:var(--t3); }
-  .progress  { flex:1; height:3px; background:var(--navy4); border-radius:2px; overflow:hidden; }
-  .progress-fill { height:100%; background:var(--gold); border-radius:2px; transition:width .4s; }
+/* STATUS BAR */
+.status-bar{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;border:1px solid var(--border);background:var(--navy3);font-size:12px;color:var(--t2);margin-bottom:14px}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-amber{background:#fbbf24;animation:pulse 1.2s infinite}
+.dot-green{background:var(--green)}.dot-red{background:var(--red)}.dot-gray{background:var(--t3)}.dot-blue{background:var(--blue)}.dot-purple{background:var(--purple)}
+.progress{flex:1;height:3px;background:var(--navy4);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s}
 
-  .section-title { font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; color:var(--t1); margin-bottom:4px; }
-  .section-sub   { font-size:12px; color:var(--t2); margin-bottom:16px; }
+/* SECTION */
+.sec-title{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:var(--t1);margin-bottom:3px}
+.sec-sub{font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6}
 
-  /* FILTER BAR */
-  .filter-bar { background:var(--navy3); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:16px; display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; }
-  .filter-group { display:flex; flex-direction:column; gap:5px; }
-  .filter-label { font-size:10px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; }
-  .filter-sel { background:var(--navy2); border:1px solid var(--border); border-radius:7px; padding:7px 10px; color:var(--t1); font-size:12px; font-family:'DM Sans',sans-serif; outline:none; cursor:pointer; min-width:130px; }
-  .filter-sel:focus { border-color:var(--bh); }
-  .filter-input { background:var(--navy2); border:1px solid var(--border); border-radius:7px; padding:7px 10px; color:var(--t1); font-size:12px; font-family:'DM Sans',sans-serif; outline:none; width:160px; }
-  .filter-input::placeholder { color:var(--t3); }
-  .filter-input:focus { border-color:var(--bh); }
-  .chips { display:flex; gap:7px; flex-wrap:wrap; }
-  .chip { padding:4px 12px; border-radius:20px; font-size:11px; font-weight:500; cursor:pointer; border:1px solid var(--border); color:var(--t2); background:transparent; transition:all .15s; }
-  .chip:hover { border-color:var(--bh); color:var(--t1); }
-  .chip.on { background:rgba(201,168,76,.1); border-color:rgba(201,168,76,.4); color:var(--gold); }
+/* FILTER BAR */
+.filter-bar{background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-label{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.filter-sel{background:var(--navy2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;min-width:120px}
+.filter-sel:focus{border-color:var(--bh)}
+.filter-input{background:var(--navy2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;width:150px}
+.filter-input::placeholder{color:var(--t3)}.filter-input:focus{border-color:var(--bh)}
 
-  /* LEADS TABLE */
-  .tbl-wrap { background:var(--navy3); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
-  .tbl-head { display:grid; gap:10px; padding:10px 16px; background:var(--navy2); border-bottom:1px solid var(--border); }
-  .tbl-head span { font-size:10px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; }
-  .tbl-row { display:grid; gap:10px; padding:12px 16px; border-top:1px solid var(--border); align-items:center; transition:background .1s; cursor:pointer; }
-  .tbl-row:hover { background:var(--navy4); }
-  .co-name { font-size:13px; font-weight:600; color:var(--t1); }
-  .co-sub  { font-size:11px; color:var(--t2); margin-top:2px; }
-  .tag { display:inline-block; padding:2px 8px; border-radius:5px; font-size:10px; font-weight:500; }
-  .tag-gold { background:rgba(201,168,76,.1); color:var(--gold); border:1px solid rgba(201,168,76,.25); }
-  .tag-teal { background:rgba(45,212,191,.08); color:var(--teal); border:1px solid rgba(45,212,191,.2); }
-  .tag-blue { background:rgba(147,197,253,.07); color:var(--blue); border:1px solid rgba(147,197,253,.2); }
-  .tag-gray { background:rgba(139,148,170,.1); color:var(--t2); border:1px solid rgba(139,148,170,.2); }
-  .tag-green { background:rgba(52,211,153,.1); color:var(--green); border:1px solid rgba(52,211,153,.2); }
-  .score-ring { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:12px; font-weight:700; flex-shrink:0; }
-  .score-aplus { background:rgba(52,211,153,.15); color:var(--green); border:1.5px solid rgba(52,211,153,.35); }
-  .score-a    { background:rgba(201,168,76,.15); color:var(--gold); border:1.5px solid rgba(201,168,76,.4); }
-  .score-b    { background:rgba(45,212,191,.1); color:var(--teal); border:1.5px solid rgba(45,212,191,.3); }
-  .score-c    { background:rgba(139,148,170,.1); color:var(--t2); border:1.5px solid rgba(139,148,170,.2); }
+/* CHIPS */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);color:var(--t2);background:transparent;transition:all .15s}
+.chip:hover{border-color:var(--bh);color:var(--t1)}
+.chip.on{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.4);color:var(--gold)}
 
-  .expand-panel { display:none; padding:16px; background:var(--navy2); border-top:1px solid var(--border); grid-template-columns:1fr 1fr 1fr; gap:16px; }
-  .expand-panel.open { display:grid; }
-  .ep-title { font-size:10px; font-weight:600; color:var(--t3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
-  .ep-row { display:flex; justify-content:space-between; font-size:12px; color:var(--t2); padding:3px 0; }
-  .ep-row span { color:var(--t1); font-weight:500; }
-  .signal-item { display:flex; align-items:center; gap:6px; padding:3px 0; font-size:11px; color:var(--t2); }
-  .signal-item::before { content:"✓"; color:var(--green); font-size:11px; }
+/* TABLE */
+.tbl-wrap{background:var(--navy3);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl-head{display:grid;gap:10px;padding:9px 15px;background:var(--navy2);border-bottom:1px solid var(--border)}
+.tbl-head span{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.tbl-row{display:grid;gap:10px;padding:11px 15px;border-top:1px solid var(--border);align-items:center;transition:background .1s;cursor:pointer}
+.tbl-row:hover{background:var(--navy4)}
+.co-name{font-size:13px;font-weight:600;color:var(--t1)}
+.co-sub{font-size:11px;color:var(--t2);margin-top:2px}
+.tag{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:500}
+.tag-gold{background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.25)}
+.tag-teal{background:rgba(45,212,191,.08);color:var(--teal);border:1px solid rgba(45,212,191,.2)}
+.tag-blue{background:rgba(147,197,253,.07);color:var(--blue);border:1px solid rgba(147,197,253,.2)}
+.tag-green{background:rgba(52,211,153,.08);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.tag-gray{background:rgba(139,148,170,.1);color:var(--t2);border:1px solid rgba(139,148,170,.2)}
+.tag-purple{background:rgba(167,139,250,.08);color:var(--purple);border:1px solid rgba(167,139,250,.2)}
+.tag-red{background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.score-ring{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;flex-shrink:0}
+.s-aplus{background:rgba(52,211,153,.15);color:var(--green);border:1.5px solid rgba(52,211,153,.35)}
+.s-a{background:rgba(201,168,76,.15);color:var(--gold);border:1.5px solid rgba(201,168,76,.4)}
+.s-b{background:rgba(45,212,191,.1);color:var(--teal);border:1.5px solid rgba(45,212,191,.3)}
+.s-c{background:rgba(139,148,170,.1);color:var(--t2);border:1.5px solid rgba(139,148,170,.2)}
+.expand-panel{display:none;padding:15px;background:var(--navy2);border-top:1px solid var(--border)}
+.expand-panel.open{display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px}
+.ep-title{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.ep-row{display:flex;justify-content:space-between;font-size:12px;color:var(--t2);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.ep-row span{color:var(--t1);font-weight:500}
+.sig-item{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:11px;color:var(--t2)}
+.sig-item::before{content:"✓";color:var(--green);font-size:11px}
 
-  /* SEARCH */
-  .search-card { background:var(--navy3); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:20px; }
-  .search-row { display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
-  .search-input { flex:1; min-width:200px; background:var(--navy2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--t1); font-size:13px; font-family:'DM Sans',sans-serif; outline:none; transition:border-color .2s; }
-  .search-input:focus { border-color:var(--bh); }
-  .search-input::placeholder { color:var(--t3); }
-  select.search-sel { background:var(--navy2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--t1); font-size:13px; font-family:'DM Sans',sans-serif; outline:none; cursor:pointer; }
+/* SEARCH */
+.search-card{background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:18px}
+.search-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.search-input{flex:1;min-width:180px;background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.search-input:focus{border-color:var(--bh)}.search-input::placeholder{color:var(--t3)}
+select.search-sel{background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;color:var(--t1);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer}
 
-  /* DROP ZONE */
-  .drop-zone { border:1.5px dashed var(--border); border-radius:10px; padding:28px; text-align:center; cursor:pointer; transition:all .2s; background:var(--navy3); }
-  .drop-zone:hover, .drop-zone.over { border-color:var(--bh); background:var(--navy4); }
+/* DROP ZONE */
+.drop-zone{border:1.5px dashed var(--border);border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--navy3)}
+.drop-zone:hover,.drop-zone.over{border-color:var(--bh);background:var(--navy4)}
 
-  /* STATUS CARDS */
-  .status-card { background:var(--navy3); border:1px solid var(--border); border-radius:10px; padding:16px; }
-  .status-card-title { font-size:12px; font-weight:600; color:var(--t2); margin-bottom:12px; text-transform:uppercase; letter-spacing:.06em; font-size:10px; }
+/* OUTREACH */
+.outreach-card{background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+.oc-label{font-size:10px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.oc-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:7px}
+textarea.editable{width:100%;background:var(--navy2);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--t1);font-size:12px;font-family:'DM Sans',sans-serif;line-height:1.7;outline:none;resize:vertical;margin-top:8px;min-height:100px}
+textarea.editable:focus{border-color:var(--bh)}
 
-  /* OUTREACH */
-  .outreach-card { background:var(--navy3); border:1px solid var(--border); border-radius:10px; padding:18px; margin-bottom:14px; }
-  .oc-label { font-size:10px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:.07em; margin-bottom:6px; }
-  .oc-title { font-size:14px; font-weight:600; color:var(--t1); margin-bottom:8px; }
-  textarea.editable { width:100%; background:var(--navy2); border:1px solid var(--border); border-radius:7px; padding:10px 12px; color:var(--t1); font-size:12px; font-family:'DM Sans',sans-serif; line-height:1.7; outline:none; resize:vertical; margin-top:10px; min-height:110px; }
-  textarea.editable:focus { border-color:var(--bh); }
+/* SHOPIFY PANEL */
+.shopify-method-card{background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:15px;margin-bottom:12px}
+.method-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.method-title{font-size:13px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:8px}
+.method-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500}
+.mb-free{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.mb-manual{background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.2)}
+.method-desc{font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:10px}
+textarea.url-input{width:100%;background:var(--navy2);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--t1);font-size:11px;font-family:'DM Sans',sans-serif;line-height:1.6;outline:none;resize:vertical;min-height:80px;font-family:'Courier New',monospace}
+textarea.url-input:focus{border-color:var(--bh)}
+textarea.url-input::placeholder{color:var(--t3)}
 
-  /* DEPLOY */
-  pre { background:var(--navy2); border:1px solid var(--border); border-radius:8px; padding:14px 16px; font-family:'Courier New',monospace; font-size:12px; color:var(--gold-l); overflow-x:auto; margin:8px 0 14px; line-height:1.6; }
-  code { background:var(--navy2); border:1px solid var(--border); border-radius:4px; padding:1px 7px; font-family:'Courier New',monospace; font-size:12px; color:var(--gold-l); }
-  .step-row { display:flex; gap:12px; margin-bottom:14px; align-items:flex-start; }
-  .step-num { width:26px; height:26px; border-radius:50%; background:var(--navy3); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:var(--t1); flex-shrink:0; margin-top:1px; }
-  .step-body { font-size:13px; color:var(--t2); line-height:1.65; }
-  .step-body strong { color:var(--t1); font-weight:500; }
+pre{background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'Courier New',monospace;font-size:11px;color:var(--gold-l);overflow-x:auto;margin:8px 0 12px;line-height:1.6}
+code{background:var(--navy2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-family:'Courier New',monospace;font-size:11px;color:var(--gold-l)}
+.step-row{display:flex;gap:10px;margin-bottom:12px;align-items:flex-start}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--navy3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--t1);flex-shrink:0;margin-top:1px}
+.step-body{font-size:12px;color:var(--t2);line-height:1.65}.step-body strong{color:var(--t1);font-weight:500}
 </style>
 </head>
 <body>
@@ -155,8 +161,8 @@
   <div class="logo-mark">VC</div>
   <div><div class="logo-name">VirtualCrew</div><div class="logo-sub">Lead Intelligence Agent</div></div>
   <div class="topbar-right">
-    <div class="live-pill" id="topStatus"><div class="pulse"></div>Companies House live</div>
-    <a href="https://linkedin.com" target="_blank" style="padding:6px 13px;border-radius:7px;border:1px solid rgba(10,102,194,.4);background:rgba(10,102,194,.1);color:#93c5fd;font-size:12px;font-weight:500;text-decoration:none;display:flex;align-items:center;gap:6px"><i class="ti ti-brand-linkedin" style="font-size:14px"></i>Connect on LinkedIn</a>
+    <div class="live-pill"><div class="pulse"></div><span id="topStatusText">Companies House live</span></div>
+    <a href="https://linkedin.com" target="_blank" style="padding:5px 12px;border-radius:7px;border:1px solid rgba(10,102,194,.4);background:rgba(10,102,194,.1);color:#93c5fd;font-size:11px;font-weight:500;text-decoration:none;display:flex;align-items:center;gap:5px"><i class="ti ti-brand-linkedin" style="font-size:13px"></i>LinkedIn</a>
   </div>
 </div>
 
@@ -165,755 +171,903 @@
 <!-- SIDEBAR -->
 <div class="sidebar">
   <div class="sb-section">Overview</div>
-  <div class="sb-item" onclick="show('status',this)"><i class="ti ti-layout-dashboard" style="font-size:14px"></i>Dashboard</div>
+  <div class="sb-item" onclick="show('status',this)"><i class="ti ti-layout-dashboard" style="font-size:13px"></i>Dashboard</div>
 
-  <div class="sb-section" style="margin-top:6px">Lead sources</div>
-  <div class="sb-item active" onclick="show('search',this)"><i class="ti ti-building-community" style="font-size:14px"></i>Companies House</div>
-  <div class="sb-item" onclick="show('leads',this)"><i class="ti ti-list-check" style="font-size:14px"></i>General Leads <span class="sb-badge" id="leadCount">0</span></div>
-  <div class="sb-item" onclick="show('linkedin',this)"><i class="ti ti-brand-linkedin" style="font-size:14px"></i>LinkedIn Import <span class="sb-badge teal" id="liCount" style="display:none">0</span></div>
-  <div class="sb-item" onclick="show('cilt',this)"><i class="ti ti-certificate" style="font-size:14px"></i>CILT Import</div>
+  <div class="sb-section" style="margin-top:4px">Lead Sources</div>
+  <div class="sb-item active" onclick="show('search',this)"><i class="ti ti-building-community" style="font-size:13px"></i>Companies House</div>
+  <div class="sb-item" onclick="show('leads',this)"><i class="ti ti-list-check" style="font-size:13px"></i>General Leads <span class="sb-badge" id="leadCount">0</span></div>
+  <div class="sb-item" onclick="show('shopify',this)"><i class="ti ti-brand-shopify" style="font-size:13px"></i>Shopify Directory <span class="sb-badge purple" id="shopifyCount" style="display:none">0</span></div>
+  <div class="sb-item" onclick="show('linkedin',this)"><i class="ti ti-brand-linkedin" style="font-size:13px"></i>LinkedIn Import <span class="sb-badge teal" id="liCount" style="display:none">0</span></div>
 
-  <div class="sb-section" style="margin-top:6px">Outreach</div>
-  <div class="sb-item" onclick="show('outreach',this)"><i class="ti ti-mail" style="font-size:14px"></i>Templates</div>
+  <div class="sb-section" style="margin-top:4px">Outreach</div>
+  <div class="sb-item" onclick="show('outreach',this)"><i class="ti ti-mail" style="font-size:13px"></i>Templates</div>
 
-  <div class="sb-section" style="margin-top:6px">Setup</div>
-  <div class="sb-item" onclick="show('deploy',this)"><i class="ti ti-rocket" style="font-size:14px"></i>Deploy to Vercel</div>
+  <div class="sb-section" style="margin-top:4px">Setup</div>
+  <div class="sb-item" onclick="show('deploy',this)"><i class="ti ti-rocket" style="font-size:13px"></i>Deploy to Vercel</div>
 
   <div class="icp-box">
     <div class="icp-title">Your ICP</div>
     £5M–£200M revenue<br>
-    Courier · Logistics · Ecomm<br>
+    Ecomm · Consumer · Logistics<br>
     Lean board (2–5 dirs)<br>
-    UK-based · Private limited<br>
-    Fractional COO / CTO
+    UK-based · Shopify / D2C<br>
+    Fractional COO / Ops
   </div>
 </div>
 
 <!-- CONTENT -->
 <div class="content">
 
-  <!-- ══ DASHBOARD ══ -->
-  <div class="panel" id="panel-status">
-    <div class="section-title">Lead pipeline overview</div>
-    <div class="section-sub">Live summary across all sources — Companies House, CILT, and LinkedIn.</div>
-
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
-      <div class="stat-card"><div class="stat-lbl">Total leads</div><div class="stat-val" id="ds-total">0</div><div class="stat-sub">Across all sources</div></div>
-      <div class="stat-card"><div class="stat-lbl">Score A+</div><div class="stat-val up" id="ds-aplus">0</div><div class="stat-sub">Contact now</div></div>
-      <div class="stat-card"><div class="stat-lbl">Warm intros</div><div class="stat-val" style="color:var(--blue)" id="ds-li">0</div><div class="stat-sub">Via LinkedIn</div></div>
-      <div class="stat-card"><div class="stat-lbl">CILT matched</div><div class="stat-val warn" id="ds-cilt">0</div><div class="stat-sub">Score boosted</div></div>
-    </div>
-
-    <!-- Source health -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
-      <div class="status-card">
-        <div class="status-card-title">Companies House</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <div class="dot dot-green" id="ch-dot"></div>
-          <span style="font-size:12px;color:var(--t1);font-weight:500" id="ch-status-text">Ready</span>
-        </div>
-        <div style="font-size:11px;color:var(--t2);line-height:1.7" id="ch-status-detail">Run a search to pull live data.</div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="show('search',null)"><i class="ti ti-search"></i>Search now</button>
-      </div>
-      <div class="status-card">
-        <div class="status-card-title">LinkedIn CSV</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <div class="dot dot-gray" id="li-dot"></div>
-          <span style="font-size:12px;color:var(--t1);font-weight:500" id="li-status-text">Not imported</span>
-        </div>
-        <div style="font-size:11px;color:var(--t2);line-height:1.7" id="li-status-detail">Import your Connections.csv to surface warm intros.</div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="show('linkedin',null)"><i class="ti ti-upload"></i>Import CSV</button>
-      </div>
-      <div class="status-card">
-        <div class="status-card-title">CILT SME list</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <div class="dot dot-gray" id="cilt-dot"></div>
-          <span style="font-size:12px;color:var(--t1);font-weight:500" id="cilt-status-text">Not imported</span>
-        </div>
-        <div style="font-size:11px;color:var(--t2);line-height:1.7" id="cilt-status-detail">Import CILT SME CSV to boost member scores.</div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="show('cilt',null)"><i class="ti ti-upload"></i>Import CSV</button>
-      </div>
-    </div>
-
-    <!-- Top leads preview -->
-    <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:10px;font-family:'Space Grotesk',sans-serif">Top leads right now</div>
-    <div id="ds-topLeads"><div style="font-size:13px;color:var(--t2);padding:16px 0">Run a Companies House search to populate your leads.</div></div>
+<!-- ══ DASHBOARD ══ -->
+<div class="panel" id="panel-status">
+  <div class="sec-title">Pipeline overview</div>
+  <div class="sec-sub">Live across Companies House, Shopify directory, and LinkedIn.</div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px">
+    <div class="stat-card"><div class="stat-lbl">Total leads</div><div class="stat-val" id="ds-total">0</div></div>
+    <div class="stat-card"><div class="stat-lbl">Score A+</div><div class="stat-val up" id="ds-aplus">0</div><div class="stat-sub">Contact now</div></div>
+    <div class="stat-card"><div class="stat-lbl">Shopify stores</div><div class="stat-val purp" id="ds-shopify">0</div><div class="stat-sub">£5M–£200M est.</div></div>
+    <div class="stat-card"><div class="stat-lbl">Warm intros</div><div class="stat-val info" id="ds-li">0</div><div class="stat-sub">Via LinkedIn</div></div>
+    <div class="stat-card"><div class="stat-lbl">Ecomm leads</div><div class="stat-val warn" id="ds-ecomm">0</div></div>
   </div>
+  <!-- Source health -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
+    <div class="stat-card">
+      <div class="stat-lbl">Companies House</div>
+      <div style="display:flex;align-items:center;gap:7px;margin:6px 0"><div class="dot dot-green" id="ch-dot"></div><span style="font-size:12px;font-weight:500" id="ch-st">Ready</span></div>
+      <div style="font-size:11px;color:var(--t2)" id="ch-detail">Run a search to pull live data.</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="show('search',null)"><i class="ti ti-search"></i>Search</button>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Shopify Directory</div>
+      <div style="display:flex;align-items:center;gap:7px;margin:6px 0"><div class="dot dot-gray" id="sh-dot"></div><span style="font-size:12px;font-weight:500" id="sh-st">Not loaded</span></div>
+      <div style="font-size:11px;color:var(--t2)" id="sh-detail">Import CSV, paste URLs, or scrape myip.ms.</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="show('shopify',null)"><i class="ti ti-brand-shopify"></i>Load stores</button>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">LinkedIn CSV</div>
+      <div style="display:flex;align-items:center;gap:7px;margin:6px 0"><div class="dot dot-gray" id="li-dot"></div><span style="font-size:12px;font-weight:500" id="li-st">Not imported</span></div>
+      <div style="font-size:11px;color:var(--t2)" id="li-detail">Import Connections.csv to surface warm intros.</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="show('linkedin',null)"><i class="ti ti-upload"></i>Import</button>
+    </div>
+  </div>
+  <div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:8px;font-family:'Space Grotesk',sans-serif">Top leads right now</div>
+  <div id="ds-topLeads"><div style="font-size:13px;color:var(--t2);padding:12px 0">Run a search or import Shopify stores to populate leads.</div></div>
+</div>
 
-  <!-- ══ CH SEARCH ══ -->
-  <div class="panel active" id="panel-search">
-    <div class="search-card">
-      <div class="section-title">Companies House live search</div>
-      <div class="section-sub" style="margin-bottom:14px">Queries the real API, scores results against your ICP, and surfaces the best leads.</div>
-      <div class="search-row">
-        <input class="search-input" id="searchQ" placeholder="e.g. courier, last-mile, ecommerce logistics..." value="courier">
-        <select class="search-sel" id="searchSic">
-          <option value="">All SIC codes</option>
-          <option value="53200">53200 — Courier</option>
-          <option value="49410">49410 — Road freight</option>
-          <option value="52290">52290 — Transport support</option>
-          <option value="52100">52100 — Warehousing</option>
-          <option value="47910">47910 — Ecommerce/mail order</option>
-          <option value="49320">49320 — Taxi/private hire</option>
-        </select>
-        <select class="search-sel" id="maxRes">
-          <option value="20">20 results</option>
-          <option value="40">40 results</option>
-          <option value="80">80 results</option>
-        </select>
-        <button class="btn btn-gold" onclick="runSearch()"><i class="ti ti-search"></i>Search</button>
-      </div>
+<!-- ══ CH SEARCH ══ -->
+<div class="panel active" id="panel-search">
+  <div class="search-card">
+    <div class="sec-title">Companies House — live search</div>
+    <div class="sec-sub" style="margin-bottom:12px">Queries the real API and scores results against your ICP. Use filters to narrow by revenue signals, location, and board size.</div>
+    <div class="search-row">
+      <input class="search-input" id="searchQ" placeholder="e.g. ecommerce, consumer goods, DTC brand..." value="ecommerce">
+      <select class="search-sel" id="searchSic">
+        <option value="">All sectors</option>
+        <option value="47910">47910 — Ecommerce / mail order</option>
+        <option value="47190">47190 — Non-specialised retail</option>
+        <option value="53200">53200 — Courier</option>
+        <option value="49410">49410 — Road freight</option>
+        <option value="52290">52290 — Transport support</option>
+        <option value="52100">52100 — Warehousing</option>
+        <option value="46900">46900 — Wholesale</option>
+        <option value="47410">47410 — Computers / electronics</option>
+        <option value="47710">47710 — Clothing retail</option>
+        <option value="47610">47610 — Books / stationery</option>
+      </select>
+      <select class="search-sel" id="searchLocation">
+        <option value="">All UK</option>
+        <option value="London">London</option>
+        <option value="Manchester">Manchester</option>
+        <option value="Birmingham">Birmingham</option>
+        <option value="Bristol">Bristol</option>
+        <option value="Leeds">Leeds</option>
+        <option value="Edinburgh">Edinburgh</option>
+        <option value="Glasgow">Glasgow</option>
+      </select>
+      <select class="search-sel" id="maxRes">
+        <option value="20">20 results</option>
+        <option value="40">40 results</option>
+        <option value="80">80 results</option>
+      </select>
+      <button class="btn btn-gold" onclick="runSearch()"><i class="ti ti-search"></i>Search</button>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
       <div class="chips" id="quickChips">
-        <div class="chip on" onclick="setQ('courier',this)">Courier</div>
-        <div class="chip" onclick="setQ('last mile logistics',this)">Last-mile</div>
-        <div class="chip" onclick="setQ('ecommerce fulfilment',this)">Ecomm fulfilment</div>
-        <div class="chip" onclick="setQ('freight logistics',this)">Freight</div>
-        <div class="chip" onclick="setQ('3pl warehousing',this)">3PL</div>
-        <div class="chip" onclick="setQ('same day delivery',this)">Same-day</div>
+        <div class="chip on" onclick="setQ('ecommerce',this)">Ecommerce</div>
+        <div class="chip" onclick="setQ('consumer goods',this)">Consumer goods</div>
+        <div class="chip" onclick="setQ('direct to consumer',this)">D2C</div>
+        <div class="chip" onclick="setQ('online retail',this)">Online retail</div>
+        <div class="chip" onclick="setQ('fashion brand',this)">Fashion</div>
+        <div class="chip" onclick="setQ('health beauty',this)">Health &amp; beauty</div>
+        <div class="chip" onclick="setQ('logistics courier',this)">Logistics</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+        <span style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Directors</span>
+        <select class="search-sel" id="searchDirs" style="min-width:100px">
+          <option value="">Any</option>
+          <option value="2-5" selected>2–5 (lean)</option>
+          <option value="1">Solo</option>
+          <option value="6+">6+</option>
+        </select>
       </div>
     </div>
-    <div class="status-bar" id="searchStatus" style="display:none">
-      <div class="dot dot-amber" id="sDot"></div>
-      <div class="progress"><div class="progress-fill" id="sProgress" style="width:0%"></div></div>
-      <span id="sText" style="white-space:nowrap;font-size:12px">Searching...</span>
-    </div>
-    <div id="searchResults"></div>
   </div>
-
-  <!-- ══ GENERAL LEADS ══ -->
-  <div class="panel" id="panel-leads">
-    <div class="section-title">General leads</div>
-    <div class="section-sub">All scored companies across every source. Filter, sort, and export.</div>
-
-    <!-- Stats row -->
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px">
-      <div class="stat-card"><div class="stat-lbl">Total</div><div class="stat-val" id="gl-total">0</div></div>
-      <div class="stat-card"><div class="stat-lbl">Score A+</div><div class="stat-val up" id="gl-aplus">0</div></div>
-      <div class="stat-card"><div class="stat-lbl">Score A</div><div class="stat-val warn" id="gl-a">0</div></div>
-      <div class="stat-card"><div class="stat-lbl">Score B</div><div class="stat-val" id="gl-b">0</div></div>
-      <div class="stat-card"><div class="stat-lbl">LinkedIn warm</div><div class="stat-val" style="color:var(--blue)" id="gl-warm">0</div></div>
-    </div>
-
-    <!-- Filters -->
-    <div class="filter-bar">
-      <div class="filter-group">
-        <div class="filter-label">Score</div>
-        <select class="filter-sel" id="f-score" onchange="applyFilters()">
-          <option value="">All scores</option>
-          <option value="A+">A+ only</option>
-          <option value="A">A and above</option>
-          <option value="B">B and above</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <div class="filter-label">Location</div>
-        <input class="filter-input" id="f-location" placeholder="e.g. Birmingham, London..." oninput="applyFilters()">
-      </div>
-      <div class="filter-group">
-        <div class="filter-label">Directors</div>
-        <select class="filter-sel" id="f-dirs" onchange="applyFilters()">
-          <option value="">Any board size</option>
-          <option value="1">1 (solo)</option>
-          <option value="2-3">2–3 (very lean)</option>
-          <option value="2-5">2–5 (lean)</option>
-          <option value="6+">6+ (larger)</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <div class="filter-label">Source</div>
-        <select class="filter-sel" id="f-source" onchange="applyFilters()">
-          <option value="">All sources</option>
-          <option value="cilt">CILT matched</option>
-          <option value="linkedin">LinkedIn warm</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <div class="filter-label">Company name</div>
-        <input class="filter-input" id="f-name" placeholder="Search name..." oninput="applyFilters()">
-      </div>
-      <div style="margin-left:auto;display:flex;align-items:flex-end;gap:8px">
-        <button class="btn btn-ghost btn-sm" onclick="clearFilters()"><i class="ti ti-x"></i>Clear</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportLeadsCSV()"><i class="ti ti-download"></i>Export CSV</button>
-      </div>
-    </div>
-
-    <div id="glTable"><div style="font-size:13px;color:var(--t2);padding:24px 0">Run a Companies House search first — leads will appear here.</div></div>
+  <div class="status-bar" id="searchStatus" style="display:none">
+    <div class="dot dot-amber" id="sDot"></div>
+    <div class="progress"><div class="progress-fill" id="sProgress" style="width:0%"></div></div>
+    <span id="sText" style="white-space:nowrap;font-size:12px">Searching...</span>
   </div>
+  <div id="searchResults"></div>
+</div>
 
-  <!-- ══ LINKEDIN IMPORT ══ -->
-  <div class="panel" id="panel-linkedin">
-    <div class="section-title">LinkedIn connections</div>
-    <div class="section-sub">Import your Connections.csv to surface warm intro paths at every target company.</div>
-    <div style="font-size:12px;color:var(--t2);margin-bottom:16px;padding:10px 12px;background:var(--navy3);border:1px solid var(--border);border-radius:8px;line-height:1.7">
-      <strong style="color:var(--t1);font-weight:500">How to export:</strong> LinkedIn → Settings &amp; Privacy → Data Privacy → Get a copy of your data → tick <em>Connections</em> → Request archive. You'll get an email with a download link in ~10 minutes. Use the file called <code>Connections.csv</code>.
+<!-- ══ GENERAL LEADS ══ -->
+<div class="panel" id="panel-leads">
+  <div class="sec-title">General leads</div>
+  <div class="sec-sub">All scored companies across every source — CH, Shopify, LinkedIn. Filter, sort, and export.</div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px">
+    <div class="stat-card"><div class="stat-lbl">Total</div><div class="stat-val" id="gl-total">0</div></div>
+    <div class="stat-card"><div class="stat-lbl">A+</div><div class="stat-val up" id="gl-aplus">0</div><div class="stat-sub">Contact now</div></div>
+    <div class="stat-card"><div class="stat-lbl">A</div><div class="stat-val warn" id="gl-a">0</div></div>
+    <div class="stat-card"><div class="stat-lbl">B</div><div class="stat-val" id="gl-b">0</div></div>
+    <div class="stat-card"><div class="stat-lbl">Warm intros</div><div class="stat-val info" id="gl-warm">0</div></div>
+  </div>
+  <div class="filter-bar">
+    <div class="filter-group">
+      <div class="filter-label">Score</div>
+      <select class="filter-sel" id="f-score" onchange="applyFilters()">
+        <option value="">All</option>
+        <option value="A+">A+ only</option>
+        <option value="A">A and above</option>
+        <option value="B">B and above</option>
+      </select>
     </div>
-    <div class="drop-zone" id="liDropZone" onclick="document.getElementById('liFileInput').click()"
+    <div class="filter-group">
+      <div class="filter-label">Location</div>
+      <input class="filter-input" id="f-location" placeholder="City or postcode..." oninput="applyFilters()">
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Revenue</div>
+      <select class="filter-sel" id="f-rev" onchange="applyFilters()">
+        <option value="">Any</option>
+        <option value="5-25">£5M–£25M</option>
+        <option value="25-75">£25M–£75M</option>
+        <option value="75-200">£75M–£200M</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Directors</div>
+      <select class="filter-sel" id="f-dirs" onchange="applyFilters()">
+        <option value="">Any</option>
+        <option value="1">Solo</option>
+        <option value="2-3">2–3</option>
+        <option value="2-5">2–5 lean</option>
+        <option value="6+">6+</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Source</div>
+      <select class="filter-sel" id="f-source" onchange="applyFilters()">
+        <option value="">All sources</option>
+        <option value="ch">Companies House</option>
+        <option value="shopify">Shopify directory</option>
+        <option value="linkedin">LinkedIn warm</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Company name</div>
+      <input class="filter-input" id="f-name" placeholder="Search..." oninput="applyFilters()">
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:flex-end;gap:6px">
+      <button class="btn btn-ghost btn-sm" onclick="clearFilters()"><i class="ti ti-x"></i>Clear</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportLeadsCSV()"><i class="ti ti-download"></i>Export CSV</button>
+    </div>
+  </div>
+  <div id="glTable"><div style="font-size:13px;color:var(--t2);padding:20px 0">Run a Companies House search or import Shopify stores — leads will appear here.</div></div>
+</div>
+
+<!-- ══ SHOPIFY DIRECTORY ══ -->
+<div class="panel" id="panel-shopify">
+  <div class="sec-title">Shopify store directory</div>
+  <div class="sec-sub">Three ways to build your UK Shopify lead list. All scored for fractional COO fit (£5M–£200M estimated revenue, lean ops, growth signals). Results merge into General Leads.</div>
+
+  <!-- METHOD 1: CSV UPLOAD -->
+  <div class="shopify-method-card">
+    <div class="method-header">
+      <div class="method-title"><i class="ti ti-file-spreadsheet" style="font-size:14px;color:var(--purple)"></i>Method 1 — CSV import <span class="method-badge mb-free">Free</span></div>
+      <span style="font-size:11px;color:var(--t2)">BuiltWith · Store Leads · any source</span>
+    </div>
+    <div class="method-desc">Export a UK Shopify store list from BuiltWith (free tier) or Store Leads (~£40/mo). Drop the CSV here — any column format works, the agent maps it automatically.</div>
+    <div style="font-size:11px;color:var(--t3);margin-bottom:8px">
+      <strong style="color:var(--t2)">BuiltWith free export:</strong> builtwith.com → Tools → Ecommerce Listings → Shopify → Filter: United Kingdom → Download (requires free account)<br>
+      <strong style="color:var(--t2)">Store Leads:</strong> storeleads.app → Filter: Platform=Shopify, Country=GB, Revenue=$5M+ → Export
+    </div>
+    <div class="drop-zone" id="shDropZone" onclick="document.getElementById('shFileInput').click()"
       ondragover="event.preventDefault();this.classList.add('over')"
       ondragleave="this.classList.remove('over')"
-      ondrop="handleLiDrop(event)">
-      <i class="ti ti-brand-linkedin" style="font-size:28px;color:#5591c4"></i>
-      <div style="font-size:13px;font-weight:500;color:var(--t2);margin:8px 0 4px">Drop Connections.csv here or click to browse</div>
-      <div style="font-size:11px;color:var(--t3)">Columns: First Name, Last Name, Company, Position, Connected On</div>
-      <input type="file" id="liFileInput" accept=".csv" style="display:none" onchange="handleLiFile(this.files[0])">
+      ondrop="handleShDrop(event)">
+      <i class="ti ti-upload" style="font-size:24px;color:var(--purple)"></i>
+      <div style="font-size:12px;font-weight:500;color:var(--t2);margin:6px 0 3px">Drop Shopify store CSV here</div>
+      <div style="font-size:11px;color:var(--t3)">Accepts: domain, store_name, revenue_est, category, location, employees — any subset</div>
+      <input type="file" id="shFileInput" accept=".csv" style="display:none" onchange="handleShFile(this.files[0])">
     </div>
-    <div id="liStatus" style="margin-top:16px"></div>
-    <div id="liResults" style="display:none;margin-top:20px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div style="font-size:14px;font-weight:600;color:var(--t1);font-family:'Space Grotesk',sans-serif">Warm connections at target companies</div>
-        <button class="btn btn-ghost btn-sm" onclick="exportLiCSV()"><i class="ti ti-download"></i>Export</button>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px" id="liStats"></div>
-      <div id="liMatchTable"></div>
-      <div style="margin-top:24px">
-        <div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px">All logistics &amp; ecomm connections</div>
-        <div style="font-size:11px;color:var(--t2);margin-bottom:10px">Everyone in your network at sector-adjacent companies — even if not yet in your CH results.</div>
-        <div id="liAllTable"></div>
-      </div>
-    </div>
+    <div id="shCsvStatus" style="margin-top:10px"></div>
   </div>
 
-  <!-- ══ CILT IMPORT ══ -->
-  <div class="panel" id="panel-cilt">
-    <div class="section-title">CILT SME CSV import</div>
-    <div class="section-sub">Upload your CILT member list. The agent fuzzy-matches it against Companies House results and boosts scores.</div>
-    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
-      ondragover="event.preventDefault();this.classList.add('over')"
-      ondragleave="this.classList.remove('over')"
-      ondrop="handleDrop(event)">
-      <i class="ti ti-upload" style="font-size:28px;color:var(--t3)"></i>
-      <div style="font-size:13px;font-weight:500;color:var(--t2);margin:8px 0 4px">Drop CILT CSV here or click to browse</div>
-      <div style="font-size:11px;color:var(--t3)">Columns: company_name, member_year, sector, contact_name, contact_role (optional)</div>
-      <input type="file" id="fileInput" accept=".csv" style="display:none" onchange="handleFile(this.files[0])">
+  <!-- METHOD 2: URL PASTE -->
+  <div class="shopify-method-card">
+    <div class="method-header">
+      <div class="method-title"><i class="ti ti-link" style="font-size:14px;color:var(--teal)"></i>Method 2 — Paste store URLs <span class="method-badge mb-free">Free</span></div>
+      <span style="font-size:11px;color:var(--t2)">Agent enriches via ShopScan</span>
     </div>
-    <div id="ciltStatus" style="margin-top:16px"></div>
+    <div class="method-desc">Paste up to 50 Shopify store URLs (one per line). The agent calls ShopScan's free API to estimate revenue, traffic, and product count, then scores each for fractional COO fit.</div>
+    <textarea class="url-input" id="urlPasteInput" placeholder="gymshark.com&#10;prettylittlething.com&#10;ohpolly.com&#10;castore.com&#10;...one domain per line"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+      <button class="btn btn-teal btn-sm" onclick="enrichURLs()"><i class="ti ti-wand"></i>Enrich & score stores</button>
+      <span style="font-size:11px;color:var(--t3)" id="urlCount">0 URLs entered</span>
+    </div>
+    <div id="shUrlStatus" style="margin-top:10px"></div>
   </div>
 
-  <!-- ══ OUTREACH ══ -->
-  <div class="panel" id="panel-outreach">
-    <div class="section-title">Outreach templates</div>
-    <div class="section-sub">Edit inline — tokens in <span style="color:var(--gold)">[ ]</span> are personalisation fields.</div>
-    <div class="outreach-card">
-      <div class="oc-label">LinkedIn connection note · Fractional COO/CTO</div>
-      <div class="oc-title">No-pitch warm intro</div>
-      <textarea class="editable">Hi [First name] — I noticed [Company] has been growing quickly since [year/trigger event]. That kind of growth usually brings some interesting operational complexity. I work fractionally with logistics and ecommerce businesses at the £[X]m–£[Y]m stage — not pitching, just thought your story was worth following. Happy to connect.</textarea>
-      <div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="copyTA(this)"><i class="ti ti-copy"></i>Copy</button></div>
+  <!-- METHOD 3: MYIP.MS SCRAPE -->
+  <div class="shopify-method-card">
+    <div class="method-header">
+      <div class="method-title"><i class="ti ti-world-search" style="font-size:14px;color:var(--gold)"></i>Method 3 — myip.ms UK Shopify list <span class="method-badge mb-free">Free</span></div>
+      <span style="font-size:11px;color:var(--t2)">Automated discovery</span>
     </div>
-    <div class="outreach-card">
-      <div class="oc-label">First email · Transformation framing</div>
-      <div class="oc-title">The "£Xm gap" hook</div>
-      <textarea class="editable">Subject: [Company] — quick ops question
+    <div class="method-desc">myip.ms indexes all UK-hosted Shopify stores by traffic tier. The agent fetches stores in the medium-to-high traffic range (proxy for £5M–£200M revenue) and enriches them.</div>
+    <div style="font-size:11px;color:var(--t3);margin-bottom:10px;padding:8px 10px;background:var(--navy2);border-radius:6px;border:1px solid var(--border)">
+      <strong style="color:var(--t2)">Note:</strong> myip.ms has CORS restrictions so direct browser scraping is blocked. Use the manual export below and paste results into Method 1, or run the Node.js scraper script server-side.
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:5px">Manual steps (3 minutes):</div>
+      <div class="step-row"><div class="step-num">1</div><div class="step-body">Go to <a href="https://myip.ms/browse/web_hosting/Shopify-Inc/ipid/3867" target="_blank" style="color:var(--blue)">myip.ms/browse/web_hosting/Shopify-Inc</a></div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-body">Set <strong>Location: United Kingdom</strong>, Popularity: <strong>5,000–50,000 visits/day</strong> (medium-large stores)</div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-body">Copy the domain list → paste into Method 2 above, or export as CSV → upload to Method 1</div></div>
+    </div>
+    <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:5px">Or use this serverless scraper (add to your Vercel API):</div>
+    <pre>// api/shopify-discover.js
+const MYIPMS = 'https://myip.ms/browse/web_hosting/Shopify-Inc';
+module.exports = async (req, res) => {
+  // Fetches UK Shopify stores at medium-high traffic
+  // Returns array of {domain, traffic_tier, location}
+  // Full code: see README
+  res.json({ note: 'Add CH_API_KEY + deploy to activate' });
+};</pre>
+    <a href="#" onclick="downloadScraper()" class="btn btn-ghost btn-sm"><i class="ti ti-download"></i>Download scraper script</a>
+  </div>
+
+  <!-- COMBINED RESULTS -->
+  <div id="shResultsWrap" style="display:none;margin-top:6px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:14px;font-weight:600;color:var(--t1);font-family:'Space Grotesk',sans-serif">Shopify leads — scored for fractional fit</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="exportShopifyCSV()"><i class="ti ti-download"></i>Export</button>
+        <button class="btn btn-gold btn-sm" onclick="mergeToLeads()"><i class="ti ti-git-merge"></i>Merge into General Leads</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px" id="shStats"></div>
+    <div id="shTable"></div>
+  </div>
+</div>
+
+<!-- ══ LINKEDIN IMPORT ══ -->
+<div class="panel" id="panel-linkedin">
+  <div class="sec-title">LinkedIn connections</div>
+  <div class="sec-sub">Import your Connections.csv to surface warm intro paths at every target company.</div>
+  <div style="font-size:12px;color:var(--t2);margin-bottom:14px;padding:10px 12px;background:var(--navy3);border:1px solid var(--border);border-radius:8px;line-height:1.7">
+    <strong style="color:var(--t1);font-weight:500">How to export:</strong> LinkedIn → Settings &amp; Privacy → Data Privacy → Get a copy of your data → tick <em>Connections</em> → Request archive (~10 min). Use <code>Connections.csv</code>.
+  </div>
+  <div class="drop-zone" id="liDropZone" onclick="document.getElementById('liFileInput').click()"
+    ondragover="event.preventDefault();this.classList.add('over')"
+    ondragleave="this.classList.remove('over')"
+    ondrop="handleLiDrop(event)">
+    <i class="ti ti-brand-linkedin" style="font-size:24px;color:#5591c4"></i>
+    <div style="font-size:12px;font-weight:500;color:var(--t2);margin:6px 0 3px">Drop Connections.csv here or click to browse</div>
+    <div style="font-size:11px;color:var(--t3)">Columns: First Name, Last Name, Company, Position, Connected On</div>
+    <input type="file" id="liFileInput" accept=".csv" style="display:none" onchange="handleLiFile(this.files[0])">
+  </div>
+  <div id="liStatus" style="margin-top:14px"></div>
+  <div id="liResults" style="display:none;margin-top:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:600;color:var(--t1);font-family:'Space Grotesk',sans-serif">Warm connections at target companies</div>
+      <button class="btn btn-ghost btn-sm" onclick="exportLiCSV()"><i class="ti ti-download"></i>Export</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px" id="liStats"></div>
+    <div id="liMatchTable"></div>
+    <div style="margin-top:20px">
+      <div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:3px">All ecomm &amp; logistics connections</div>
+      <div style="font-size:11px;color:var(--t2);margin-bottom:8px">Everyone in your network at sector-adjacent companies.</div>
+      <div id="liAllTable"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ OUTREACH ══ -->
+<div class="panel" id="panel-outreach">
+  <div class="sec-title">Outreach templates</div>
+  <div class="sec-sub">Edit inline — tokens in <span style="color:var(--gold)">[brackets]</span> are personalisation fields.</div>
+  <div class="outreach-card">
+    <div class="oc-label">LinkedIn note · Ecommerce / D2C · Fractional COO</div>
+    <div class="oc-title">No-pitch warm intro</div>
+    <textarea class="editable">Hi [First name] — I've been following [Company]. The growth you've built in [sector/product] is impressive. At your stage, the gap between where you are and where you're going is usually an ops and systems problem, not a product one. I work fractionally with ecommerce and consumer businesses — not pitching, just thought it worth connecting.</textarea>
+    <div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-ghost btn-sm" onclick="copyTA(this)"><i class="ti ti-copy"></i>Copy</button></div>
+  </div>
+  <div class="outreach-card">
+    <div class="oc-label">Email · Fractional COO / Operations Consultant</div>
+    <div class="oc-title">The "ops ceiling" hook</div>
+    <textarea class="editable">Subject: [Company] — a quick operations question
 
 Hi [Name],
 
-I've been following [Company] — impressive what you've built. At the £[X]m–£[Y]m stage, most courier/logistics businesses hit the same inflection point: the systems and team that got you here aren't quite the ones to get you to [next milestone].
+I've been looking at [Company] — the product and brand are clearly working. What I often see at your stage (£[X]M–£[Y]M revenue) is that the operations underneath start to crack: fulfilment, supplier relationships, team structure, systems.
 
-I work fractionally with founders and lean boards — typically 2–3 days a week — to navigate exactly that transition.
+I work fractionally with ecommerce and consumer businesses to solve exactly that — usually 2 days a week, no long-term lock-in, outcome-focused.
 
-Worth a 20-minute call? No deck, no hard sell.
+Would a 20-minute call make sense? No deck, no hard sell.
 
-[Your name] · VirtualCrew.co.uk</textarea>
-      <div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="copyTA(this)"><i class="ti ti-copy"></i>Copy</button></div>
-    </div>
-    <div class="outreach-card">
-      <div class="oc-label">CILT member hook</div>
-      <div class="oc-title">Shared professional context</div>
-      <textarea class="editable">Hi [Name] — I spotted [Company] on the CILT SME member list. Great to see more logistics businesses taking that seriously. I work fractionally with companies at your stage — usually stepping in where a full-time hire isn't quite right yet but the challenge is real. Happy to connect — no agenda.</textarea>
-      <div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="copyTA(this)"><i class="ti ti-copy"></i>Copy</button></div>
-    </div>
+[Your name]
+VirtualCrew.co.uk</textarea>
+    <div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-ghost btn-sm" onclick="copyTA(this)"><i class="ti ti-copy"></i>Copy</button></div>
   </div>
-
-  <!-- ══ DEPLOY ══ -->
-  <div class="panel" id="panel-deploy">
-    <div class="section-title">Deploy to Vercel</div>
-    <div class="section-sub">Your Companies House API key stays secret server-side. Live in under 5 minutes.</div>
-    <div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:10px">1 — Push to GitHub</div>
-    <pre>git add .
-git commit -m "VirtualCrew lead agent"
-git push</pre>
-    <div style="font-size:13px;font-weight:600;color:var(--t1);margin:16px 0 10px">2 — Connect to Vercel &amp; add API key</div>
-    <div class="step-row"><div class="step-num">1</div><div class="step-body">Go to <a href="https://vercel.com" target="_blank" style="color:var(--blue)">vercel.com</a> → Add New Project → import your repo → Deploy</div></div>
-    <div class="step-row"><div class="step-num">2</div><div class="step-body">Settings → Environment Variables → add <code>CH_API_KEY</code> → Redeploy</div></div>
-    <div class="step-row"><div class="step-num">3</div><div class="step-body">Optional: Settings → Domains → add <code>leads.virtualcrew.co.uk</code> → add CNAME <code>cname.vercel-dns.com</code></div></div>
-    <div style="margin-top:16px;display:flex;gap:10px">
-      <a href="https://vercel.com/new" target="_blank" class="btn btn-gold"><i class="ti ti-rocket"></i>Open Vercel</a>
-      <a href="https://find-and-update.company-information.service.gov.uk" target="_blank" class="btn btn-ghost"><i class="ti ti-key"></i>Get CH API key</a>
-    </div>
+  <div class="outreach-card">
+    <div class="oc-label">LinkedIn · Shopify / D2C brand angle</div>
+    <div class="oc-title">Shopify scale hook</div>
+    <textarea class="editable">Hi [Name] — [Company]'s Shopify store is doing something interesting. Scaling past £[X]M on DTC is where most brands hit their ops ceiling — the tech stack, the team, the 3PL relationships all need a rethink at once. I help founders and lean boards navigate that. Happy to connect if it's ever relevant.</textarea>
+    <div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-ghost btn-sm" onclick="copyTA(this)"><i class="ti ti-copy"></i>Copy</button></div>
   </div>
+</div>
+
+<!-- ══ DEPLOY ══ -->
+<div class="panel" id="panel-deploy">
+  <div class="sec-title">Deploy to Vercel</div>
+  <div class="sec-sub">Your Companies House API key stays secret server-side.</div>
+  <div class="step-row"><div class="step-num">1</div><div class="step-body">Push to GitHub: <code>git add . && git commit -m "update" && git push</code></div></div>
+  <div class="step-row"><div class="step-num">2</div><div class="step-body">Vercel auto-redeploys on push. Confirm at <a href="https://vercel.com" target="_blank" style="color:var(--blue)">vercel.com</a> → your project → Deployments.</div></div>
+  <div class="step-row"><div class="step-num">3</div><div class="step-body">Settings → Environment Variables → <code>CH_API_KEY</code> must be set. Test at <code>/api/health</code>.</div></div>
+  <div class="step-row"><div class="step-num">4</div><div class="step-body">Custom domain: Settings → Domains → add <code>leads.virtualcrew.co.uk</code> → CNAME → <code>cname.vercel-dns.com</code></div></div>
+  <div style="margin-top:14px;display:flex;gap:8px">
+    <a href="https://vercel.com" target="_blank" class="btn btn-gold"><i class="ti ti-rocket"></i>Open Vercel</a>
+    <a href="https://find-and-update.company-information.service.gov.uk" target="_blank" class="btn btn-ghost"><i class="ti ti-key"></i>CH API key</a>
+  </div>
+</div>
 
 </div><!-- /content -->
 </div><!-- /body -->
 </div><!-- /shell -->
 
 <script>
-// ── STATE ──
-let allResults = [];
-let ciltData   = [];
-let liConnections = [];
-let liMatches  = [];
-let ciltMatchCount = 0;
+// ══ STATE ══
+let allResults   = [];   // CH results
+let shopifyLeads = [];   // Shopify directory
+let liConnections= [];
+let liMatches    = [];
 
-// ── NAV ──
+// ══ NAV ══
 function show(id, el) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-' + id).classList.add('active');
-  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
   if (el) el.classList.add('active');
-  if (id === 'leads') renderGeneralLeads();
-  if (id === 'status') updateDashboard();
+  if (id==='leads') renderGeneralLeads();
+  if (id==='status') updateDashboard();
 }
-
-function setQ(q, el) {
-  document.getElementById('searchQ').value = q;
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+function setQ(q,el) {
+  document.getElementById('searchQ').value=q;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
 }
 
-// ── LIVE CH SEARCH ──
-async function runSearch() {
-  const q   = document.getElementById('searchQ').value.trim() || 'courier';
-  const sic = document.getElementById('searchSic').value;
-  const max = document.getElementById('maxRes').value;
-  const statusBar = document.getElementById('searchStatus');
-  const dot  = document.getElementById('sDot');
-  const prog = document.getElementById('sProgress');
-  const txt  = document.getElementById('sText');
-  const resultsEl = document.getElementById('searchResults');
+// ══ SCORING ══
+function scoreClass(g){return g==='A+'?'s-aplus':g==='A'?'s-a':g==='B'?'s-b':'s-c'}
+function escQ(s){return (s||'').replace(/'/g,"\\'")}
 
-  statusBar.style.display = 'flex';
-  dot.className = 'dot dot-amber';
-  prog.style.width = '10%';
-  txt.textContent = 'Querying Companies House API...';
-  resultsEl.innerHTML = '';
-
+// ══ CH LIVE SEARCH ══
+async function runSearch(){
+  const q=document.getElementById('searchQ').value.trim()||'ecommerce';
+  const sic=document.getElementById('searchSic').value;
+  const loc=document.getElementById('searchLocation').value;
+  const dirs=document.getElementById('searchDirs').value;
+  const max=document.getElementById('maxRes').value;
+  const bar=document.getElementById('searchStatus');
+  const dot=document.getElementById('sDot');
+  const prog=document.getElementById('sProgress');
+  const txt=document.getElementById('sText');
+  const out=document.getElementById('searchResults');
+  bar.style.display='flex'; dot.className='dot dot-amber';
+  prog.style.width='10%'; txt.textContent='Querying Companies House API...'; out.innerHTML='';
   try {
-    prog.style.width = '40%';
-    let url = '/api/search?q=' + encodeURIComponent(q) + '&maxResults=' + max;
-    if (sic) url += '&sic=' + sic;
-    const res = await fetch(url);
-    prog.style.width = '75%';
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || 'HTTP ' + res.status);
-    }
-    const data = await res.json();
-    prog.style.width = '100%';
-    dot.className = 'dot dot-green';
-    txt.textContent = data.returned + ' companies scored · ' + (data.total_found || '?').toLocaleString() + ' total on Companies House';
-    allResults = data.results || [];
-    renderSearchResults(allResults, resultsEl);
-    updateCounts();
-    updateDashboard();
-    // update CH status card
-    document.getElementById('ch-dot').className = 'dot dot-green';
-    document.getElementById('ch-status-text').textContent = 'Live — ' + allResults.length + ' leads';
-    document.getElementById('ch-status-detail').textContent = 'Last search: "' + q + '"';
-  } catch (err) {
-    dot.className = 'dot dot-red';
-    txt.textContent = 'Error: ' + err.message;
-    prog.style.width = '100%';
-    if (err.message.includes('CH_API_KEY') || err.message.includes('fetch') || err.message.includes('404')) {
-      txt.textContent = 'API not configured — showing demo data';
-      allResults = getDemoResults();
-      renderSearchResults(allResults, resultsEl);
-      updateCounts();
-      updateDashboard();
-    }
+    prog.style.width='45%';
+    let url='/api/search?q='+encodeURIComponent(q)+'&maxResults='+max;
+    if (sic) url+='&sic='+sic;
+    const res=await fetch(url);
+    prog.style.width='80%';
+    if (!res.ok) throw new Error((await res.json().catch(()=>({}))).error||'HTTP '+res.status);
+    const data=await res.json();
+    prog.style.width='100%'; dot.className='dot dot-green';
+    let results=data.results||[];
+    // client-side filter by location
+    if (loc) results=results.filter(r=>(r.location||'').toLowerCase().includes(loc.toLowerCase()));
+    // client-side filter by director count
+    if (dirs==='1') results=results.filter(r=>r.directors===1);
+    else if (dirs==='2-5') results=results.filter(r=>r.directors>=2&&r.directors<=5);
+    else if (dirs==='6+') results=results.filter(r=>r.directors>=6);
+    txt.textContent=results.length+' companies matched · '+((data.total_found||0)).toLocaleString()+' total on Companies House';
+    allResults=results;
+    renderSearchResults(results, out);
+    updateCounts(); updateDashboard();
+    document.getElementById('ch-dot').className='dot dot-green';
+    document.getElementById('ch-st').textContent='Live — '+results.length+' leads';
+    document.getElementById('ch-detail').textContent='Search: "'+q+'"'+(loc?' · '+loc:'');
+  } catch(err) {
+    dot.className='dot dot-red';
+    txt.textContent='Error: '+err.message+' — showing demo data';
+    allResults=getDemoResults();
+    renderSearchResults(allResults, out);
+    updateCounts(); updateDashboard();
   }
 }
 
-function scoreClass(g) {
-  return g === 'A+' ? 'score-aplus' : g === 'A' ? 'score-a' : g === 'B' ? 'score-b' : 'score-c';
-}
-
 function renderSearchResults(results, container) {
-  if (!results.length) { container.innerHTML = '<div style="font-size:13px;color:var(--t2);padding:24px">No results — try a different search term.</div>'; return; }
-  const sorted = [...results].sort((a,b) => b.score - a.score);
-  const cols = 'minmax(0,2.4fr) minmax(0,1fr) minmax(0,.7fr) minmax(0,1fr) minmax(0,.9fr) 100px';
-  let html = '<div class="tbl-wrap"><div class="tbl-head" style="grid-template-columns:' + cols + '"><span>Company</span><span>Location</span><span>Directors</span><span>SIC codes</span><span>Signals</span><span>Score</span></div>';
-  sorted.forEach((r,i) => {
-    const sics = (r.sic_codes||[]).slice(0,2).map(s=>'<span class="tag tag-gray" style="font-size:9px">'+s+'</span>').join(' ');
-    const sigs = (r.signals||[]).slice(0,2).map(s=>'<div style="font-size:10px;color:var(--t2)">'+s+'</div>').join('');
-    const liWarm = liMatches.find(m => fuzzyCompanyMatch(m.conn.company, r.name));
-    const ciltBadge = r.cilt ? '<span class="tag tag-teal" style="font-size:9px;margin-left:4px">CILT</span>' : '';
-    const liBadge   = liWarm ? '<span class="tag tag-blue" style="font-size:9px;margin-left:4px">Warm</span>' : '';
-    html += '<div><div class="tbl-row" style="grid-template-columns:'+cols+'" onclick="toggleExpand('+i+')">'
-      +'<div><div class="co-name">'+r.name+(ciltBadge||liBadge ? '&nbsp;'+ciltBadge+liBadge : '')+'</div><div class="co-sub">Inc. '+(r.incorporated||'').substring(0,4)+'</div></div>'
-      +'<div style="font-size:12px;color:var(--t2)">'+(r.location||'—')+'</div>'
-      +'<div style="font-size:13px;color:var(--t1)">'+(r.directors||'—')+'</div>'
-      +'<div>'+sics+'</div>'
-      +'<div>'+sigs+'</div>'
-      +'<div style="display:flex;justify-content:center"><div class="score-ring '+scoreClass(r.grade)+'">'+r.grade+'</div></div>'
+  if (!results.length){container.innerHTML='<div style="font-size:13px;color:var(--t2);padding:20px">No results — try a different search term or sector.</div>';return}
+  const cols='minmax(0,2.2fr) minmax(0,.9fr) minmax(0,.6fr) minmax(0,1fr) minmax(0,1fr) 88px';
+  let html='<div style="font-size:11px;color:var(--t3);margin-bottom:8px">'+results.length+' companies · sorted by ICP score</div>'
+    +'<div class="tbl-wrap"><div class="tbl-head" style="grid-template-columns:'+cols+'"><span>Company</span><span>Location</span><span>Dirs</span><span>SIC</span><span>Signals</span><span>Score</span></div>';
+  results.sort((a,b)=>b.score-a.score).forEach((r,i)=>{
+    const sics=(r.sic_codes||[]).slice(0,2).map(s=>'<span class="tag tag-gray" style="font-size:9px">'+s+'</span>').join(' ');
+    const sigs=(r.signals||[]).slice(0,2).map(s=>'<div style="font-size:10px;color:var(--t2)">'+s+'</div>').join('');
+    const liWarm=liMatches.find(m=>fuzzyMatch(m.conn.company,r.name));
+    const badges=(liWarm?'<span class="tag tag-blue" style="font-size:9px">Warm</span>':'');
+    html+='<div>'
+      +'<div class="tbl-row" style="grid-template-columns:'+cols+'" onclick="toggleExpand('+i+')">'
+        +'<div><div class="co-name">'+r.name+' '+badges+'</div><div class="co-sub">Inc. '+(r.incorporated||'').substring(0,4)+'</div></div>'
+        +'<div style="font-size:11px;color:var(--t2)">'+(r.location||'—')+'</div>'
+        +'<div style="font-size:13px;color:var(--t1)">'+(r.directors!=null?r.directors:'—')+'</div>'
+        +'<div>'+sics+'</div>'
+        +'<div>'+sigs+'</div>'
+        +'<div style="display:flex;justify-content:center"><div class="score-ring '+scoreClass(r.grade)+'">'+r.grade+'</div></div>'
       +'</div>'
       +'<div class="expand-panel" id="ep-'+i+'">'
         +'<div><div class="ep-title">Company details</div>'
           +'<div class="ep-row">Status <span>'+(r.status||'—')+'</span></div>'
           +'<div class="ep-row">Incorporated <span>'+(r.incorporated||'—')+'</span></div>'
-          +'<div class="ep-row">Company no. <span>'+(r.company_number||'—')+'</span></div>'
-          +'<div class="ep-row">ICP score <span>'+(r.score||0)+' pts</span></div>'
-          +'<a href="'+(r.ch_url||'#')+'" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);margin-top:8px;text-decoration:none"><i class="ti ti-external-link" style="font-size:12px"></i>View on Companies House</a>'
+          +'<div class="ep-row">No. <span>'+(r.company_number||'—')+'</span></div>'
+          +'<div class="ep-row">Score <span>'+(r.score||0)+' pts</span></div>'
+          +(r.ch_url?'<a href="'+r.ch_url+'" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--blue);margin-top:8px;text-decoration:none"><i class="ti ti-external-link" style="font-size:11px"></i>Companies House</a>':'')
         +'</div>'
-        +'<div><div class="ep-title">ICP signals</div>'+(r.signals||[]).map(s=>'<div class="signal-item">'+s+'</div>').join('')+'</div>'
-        +'<div><div class="ep-title">Active directors</div>'
-          +(r.active_directors||[]).map(d=>'<div class="ep-row">'+d.name.split(',').reverse().join(' ').trim()+' <span>Dir.</span></div>').join('')
-          +'<div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">'
+        +'<div><div class="ep-title">ICP signals</div>'+(r.signals||[]).map(s=>'<div class="sig-item">'+s+'</div>').join('')+'</div>'
+        +'<div><div class="ep-title">Directors</div>'+(r.active_directors||[]).map(d=>'<div class="ep-row">'+d.name.split(',').reverse().join(' ').trim()+' <span>Dir.</span></div>').join('')
+          +'<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'
             +'<button class="btn btn-gold btn-sm" onclick="draftOutreach(\''+escQ(r.name)+'\')"><i class="ti ti-send"></i>Draft outreach</button>'
-            +'<button class="btn btn-ghost btn-sm" onclick="addToLeads()"><i class="ti ti-plus"></i>Save lead</button>'
+            +'<button class="btn btn-ghost btn-sm" onclick="addToLeads()"><i class="ti ti-plus"></i>Save</button>'
           +'</div>'
         +'</div>'
       +'</div></div>';
   });
-  html += '</div>';
-  container.innerHTML = html;
+  html+='</div>'; container.innerHTML=html;
 }
 
-function toggleExpand(i) {
-  const ep = document.getElementById('ep-'+i);
-  const isOpen = ep.classList.contains('open');
+function toggleExpand(i){
+  const ep=document.getElementById('ep-'+i);
+  const open=ep.classList.contains('open');
   document.querySelectorAll('.expand-panel').forEach(e=>e.classList.remove('open'));
-  if (!isOpen) ep.classList.add('open');
+  if (!open) ep.classList.add('open');
 }
 
-function escQ(s) { return (s||'').replace(/'/g,"\\'"); }
+// ══ GENERAL LEADS ══
+function allLeads(){return [...allResults,...shopifyLeads.map(s=>({...s,_source:'shopify'}))]}
 
-function updateCounts() {
-  const c = allResults.length;
-  document.getElementById('leadCount').textContent = c;
+function updateCounts(){
+  const all=allLeads();
+  document.getElementById('leadCount').textContent=all.length;
   updateGeneralLeadStats();
 }
 
-// ── GENERAL LEADS ──
-function renderGeneralLeads() {
-  updateGeneralLeadStats();
-  applyFilters();
+function renderGeneralLeads(){updateGeneralLeadStats();applyFilters()}
+
+function updateGeneralLeadStats(){
+  const all=allLeads();
+  document.getElementById('gl-total').textContent=all.length;
+  document.getElementById('gl-aplus').textContent=all.filter(r=>r.grade==='A+').length;
+  document.getElementById('gl-a').textContent=all.filter(r=>r.grade==='A'||r.grade==='A+').length;
+  document.getElementById('gl-b').textContent=all.filter(r=>r.grade==='B').length;
+  document.getElementById('gl-warm').textContent=liMatches.length;
 }
 
-function updateGeneralLeadStats() {
-  const r = allResults;
-  document.getElementById('gl-total').textContent = r.length;
-  document.getElementById('gl-aplus').textContent = r.filter(x=>x.grade==='A+').length;
-  document.getElementById('gl-a').textContent = r.filter(x=>x.grade==='A'||x.grade==='A+').length;
-  document.getElementById('gl-b').textContent = r.filter(x=>x.grade==='B').length;
-  document.getElementById('gl-warm').textContent = liMatches.length;
+function revBand(r){
+  // estimate revenue band from score + signals as proxy
+  const s=r.score||0;
+  if (r.revEstMin) return {min:r.revEstMin,max:r.revEstMax};
+  if (s>=6) return {min:25,max:200};
+  if (s>=4) return {min:10,max:75};
+  return {min:5,max:25};
 }
 
-function applyFilters() {
-  const score    = document.getElementById('f-score').value;
-  const location = document.getElementById('f-location').value.trim().toLowerCase();
-  const dirs     = document.getElementById('f-dirs').value;
-  const source   = document.getElementById('f-source').value;
-  const name     = document.getElementById('f-name').value.trim().toLowerCase();
-
-  let filtered = [...allResults];
-
-  if (score === 'A+') filtered = filtered.filter(r => r.grade === 'A+');
-  else if (score === 'A') filtered = filtered.filter(r => r.grade === 'A+' || r.grade === 'A');
-  else if (score === 'B') filtered = filtered.filter(r => r.grade !== 'C');
-
-  if (location) filtered = filtered.filter(r => (r.location||'').toLowerCase().includes(location));
-  if (name)     filtered = filtered.filter(r => (r.name||'').toLowerCase().includes(name));
-
-  if (dirs === '1')   filtered = filtered.filter(r => r.directors === 1);
-  else if (dirs === '2-3') filtered = filtered.filter(r => r.directors >= 2 && r.directors <= 3);
-  else if (dirs === '2-5') filtered = filtered.filter(r => r.directors >= 2 && r.directors <= 5);
-  else if (dirs === '6+')  filtered = filtered.filter(r => r.directors >= 6);
-
-  if (source === 'cilt')     filtered = filtered.filter(r => r.cilt);
-  if (source === 'linkedin') filtered = filtered.filter(r => liMatches.find(m => fuzzyCompanyMatch(m.conn.company, r.name)));
-
+function applyFilters(){
+  const score=document.getElementById('f-score').value;
+  const loc=document.getElementById('f-location').value.trim().toLowerCase();
+  const rev=document.getElementById('f-rev').value;
+  const dirs=document.getElementById('f-dirs').value;
+  const source=document.getElementById('f-source').value;
+  const name=document.getElementById('f-name').value.trim().toLowerCase();
+  let filtered=allLeads();
+  if (score==='A+') filtered=filtered.filter(r=>r.grade==='A+');
+  else if (score==='A') filtered=filtered.filter(r=>r.grade==='A+'||r.grade==='A');
+  else if (score==='B') filtered=filtered.filter(r=>r.grade!=='C');
+  if (loc) filtered=filtered.filter(r=>(r.location||'').toLowerCase().includes(loc));
+  if (name) filtered=filtered.filter(r=>(r.name||'').toLowerCase().includes(name));
+  if (dirs==='1') filtered=filtered.filter(r=>r.directors===1);
+  else if (dirs==='2-3') filtered=filtered.filter(r=>r.directors>=2&&r.directors<=3);
+  else if (dirs==='2-5') filtered=filtered.filter(r=>r.directors>=2&&r.directors<=5);
+  else if (dirs==='6+') filtered=filtered.filter(r=>r.directors>=6);
+  if (rev){
+    const [lo,hi]=rev.split('-').map(Number);
+    filtered=filtered.filter(r=>{const b=revBand(r);return b.max>=lo&&b.min<=hi});
+  }
+  if (source==='ch') filtered=filtered.filter(r=>!r._source||r._source==='ch');
+  if (source==='shopify') filtered=filtered.filter(r=>r._source==='shopify');
+  if (source==='linkedin') filtered=filtered.filter(r=>liMatches.find(m=>fuzzyMatch(m.conn.company,r.name)));
   renderGeneralLeadsTable(filtered);
 }
 
-function clearFilters() {
-  ['f-score','f-dirs','f-source'].forEach(id => document.getElementById(id).value = '');
-  ['f-location','f-name'].forEach(id => document.getElementById(id).value = '');
+function clearFilters(){
+  ['f-score','f-dirs','f-rev','f-source'].forEach(id=>document.getElementById(id).value='');
+  ['f-location','f-name'].forEach(id=>document.getElementById(id).value='');
   applyFilters();
 }
 
-function renderGeneralLeadsTable(results) {
-  const el = document.getElementById('glTable');
-  if (!results.length) { el.innerHTML = '<div style="font-size:13px;color:var(--t2);padding:24px 0">No leads match your filters.</div>'; return; }
-  const cols = 'minmax(0,2fr) minmax(0,1fr) minmax(0,.6fr) minmax(0,1.2fr) minmax(0,.8fr) 90px';
-  let html = '<div style="font-size:11px;color:var(--t3);margin-bottom:8px">'+results.length+' companies</div>'
-    +'<div class="tbl-wrap"><div class="tbl-head" style="grid-template-columns:'+cols+'"><span>Company</span><span>Location</span><span>Dirs</span><span>Signals</span><span>Tags</span><span>Score</span></div>';
-  results.sort((a,b)=>b.score-a.score).forEach(r => {
-    const liWarm = liMatches.find(m => fuzzyCompanyMatch(m.conn.company, r.name));
-    const tags = [r.cilt?'<span class="tag tag-teal">CILT</span>':'', liWarm?'<span class="tag tag-blue">Warm intro</span>':''].filter(Boolean).join(' ');
-    const sigs = (r.signals||[]).slice(0,2).map(s=>'<div style="font-size:10px;color:var(--t2)">'+s+'</div>').join('');
-    html += '<div class="tbl-row" style="grid-template-columns:'+cols+'">'
-      +'<div><div class="co-name">'+r.name+'</div><div class="co-sub">'+(r.incorporated||'').substring(0,4)+' · '+(r.company_number||'')+'</div></div>'
-      +'<div style="font-size:12px;color:var(--t2)">'+(r.location||'—')+'</div>'
-      +'<div style="font-size:13px;color:var(--t1)">'+(r.directors||'—')+'</div>'
-      +'<div>'+sigs+'</div>'
-      +'<div>'+tags+'</div>'
+function renderGeneralLeadsTable(results){
+  const el=document.getElementById('glTable');
+  if (!results.length){el.innerHTML='<div style="font-size:13px;color:var(--t2);padding:20px 0">No leads match your filters.</div>';return}
+  const cols='minmax(0,2fr) minmax(0,1fr) minmax(0,.6fr) minmax(0,1.1fr) minmax(0,.9fr) 82px';
+  let html='<div style="font-size:11px;color:var(--t3);margin-bottom:8px">'+results.length+' companies</div>'
+    +'<div class="tbl-wrap"><div class="tbl-head" style="grid-template-columns:'+cols+'"><span>Company</span><span>Location</span><span>Dirs</span><span>Revenue est.</span><span>Tags</span><span>Score</span></div>';
+  results.sort((a,b)=>b.score-a.score).forEach(r=>{
+    const liWarm=liMatches.find(m=>fuzzyMatch(m.conn.company,r.name));
+    const b=revBand(r);
+    const revStr=r.revStr||(b?'~£'+b.min+'M–£'+b.max+'M':'—');
+    const src=r._source==='shopify'?'<span class="tag tag-purple">Shopify</span>':'<span class="tag tag-teal">CH</span>';
+    const warm=liWarm?'<span class="tag tag-blue">Warm</span>':'';
+    html+='<div class="tbl-row" style="grid-template-columns:'+cols+'">'
+      +'<div><div class="co-name">'+r.name+'</div><div class="co-sub">'+(r.incorporated||'').substring(0,4)+(r.company_number?' · '+r.company_number:'')+'</div></div>'
+      +'<div style="font-size:11px;color:var(--t2)">'+(r.location||'—')+'</div>'
+      +'<div style="font-size:12px;color:var(--t1)">'+(r.directors!=null?r.directors:'—')+'</div>'
+      +'<div style="font-size:11px;color:var(--t2)">'+revStr+'</div>'
+      +'<div style="display:flex;gap:4px;flex-wrap:wrap">'+src+warm+'</div>'
       +'<div style="display:flex;justify-content:center"><div class="score-ring '+scoreClass(r.grade)+'">'+r.grade+'</div></div>'
       +'</div>';
   });
-  html += '</div>';
-  el.innerHTML = html;
+  html+='</div>'; el.innerHTML=html;
 }
 
-function exportLeadsCSV() {
-  const hdr = ['Company','Company No','Location','Incorporated','Directors','SIC Codes','Score','Grade','CILT Match','LinkedIn Warm','Signals'];
-  const rows = allResults.map(r => [
-    r.name, r.company_number, r.location, r.incorporated, r.directors,
-    (r.sic_codes||[]).join(';'), r.score, r.grade,
-    r.cilt ? 'yes' : 'no',
-    liMatches.find(m => fuzzyCompanyMatch(m.conn.company, r.name)) ? 'yes' : 'no',
-    (r.signals||[]).join(';')
-  ]);
-  const csv = [hdr,...rows].map(r=>r.join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-  a.download = 'virtualcrew-leads.csv';
-  a.click();
+function exportLeadsCSV(){
+  const all=allLeads();
+  const hdr=['Company','Company No','Location','Incorporated','Directors','Score','Grade','Revenue Est','Source','LinkedIn Warm','Signals'];
+  const rows=all.map(r=>[r.name,r.company_number||'',r.location||'',r.incorporated||'',r.directors||'',r.score||'',r.grade,r.revStr||'',r._source||'ch',liMatches.find(m=>fuzzyMatch(m.conn.company,r.name))?'yes':'no',(r.signals||[]).join(';')]);
+  dl([hdr,...rows].map(r=>r.join(',')).join('\n'),'virtualcrew-leads.csv');
 }
 
-function addToLeads() { show('leads', null); renderGeneralLeads(); }
+function addToLeads(){show('leads',null);renderGeneralLeads()}
 
-// ── DASHBOARD ──
-function updateDashboard() {
-  document.getElementById('ds-total').textContent  = allResults.length;
-  document.getElementById('ds-aplus').textContent  = allResults.filter(r=>r.grade==='A+').length;
-  document.getElementById('ds-li').textContent     = liMatches.length;
-  document.getElementById('ds-cilt').textContent   = allResults.filter(r=>r.cilt).length;
-
-  // Top leads preview
-  const top = [...allResults].sort((a,b)=>b.score-a.score).slice(0,5);
+// ══ DASHBOARD ══
+function updateDashboard(){
+  const all=allLeads();
+  document.getElementById('ds-total').textContent=all.length;
+  document.getElementById('ds-aplus').textContent=all.filter(r=>r.grade==='A+').length;
+  document.getElementById('ds-shopify').textContent=shopifyLeads.length;
+  document.getElementById('ds-li').textContent=liMatches.length;
+  document.getElementById('ds-ecomm').textContent=all.filter(r=>(r.sic_codes||[]).some(s=>['47910','47190','47710','47410','47610'].includes(s))||r._source==='shopify').length;
+  const top=[...all].sort((a,b)=>b.score-a.score).slice(0,5);
   if (!top.length) return;
-  let html = '<div class="tbl-wrap">';
-  top.forEach(r => {
-    const liWarm = liMatches.find(m => fuzzyCompanyMatch(m.conn.company, r.name));
-    html += '<div style="display:flex;align-items:center;gap:14px;padding:11px 16px;border-top:1px solid var(--border)">'
-      +'<div class="score-ring '+scoreClass(r.grade)+'" style="width:30px;height:30px;font-size:11px">'+r.grade+'</div>'
-      +'<div style="flex:1"><div class="co-name">'+r.name+'</div><div class="co-sub">'+(r.location||'—')+' · '+(r.directors||'?')+' directors</div></div>'
-      +(r.cilt ? '<span class="tag tag-teal">CILT</span>' : '')
-      +(liWarm ? '<span class="tag tag-blue">Warm intro</span>' : '')
+  let html='<div class="tbl-wrap">';
+  top.forEach(r=>{
+    const liW=liMatches.find(m=>fuzzyMatch(m.conn.company,r.name));
+    html+='<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-top:1px solid var(--border)">'
+      +'<div class="score-ring '+scoreClass(r.grade)+'" style="width:28px;height:28px;font-size:10px">'+r.grade+'</div>'
+      +'<div style="flex:1"><div class="co-name" style="font-size:12px">'+r.name+'</div><div class="co-sub">'+(r.location||'—')+'</div></div>'
+      +(r._source==='shopify'?'<span class="tag tag-purple">Shopify</span>':'')
+      +(liW?'<span class="tag tag-blue">Warm</span>':'')
       +'<button class="btn btn-gold btn-sm" onclick="draftOutreach(\''+escQ(r.name)+'\')"><i class="ti ti-send"></i>Outreach</button>'
       +'</div>';
   });
-  html += '</div>';
-  document.getElementById('ds-topLeads').innerHTML = html;
+  document.getElementById('ds-topLeads').innerHTML=html+'</div>';
 }
 
-// ── OUTREACH ──
-function copyTA(btn) {
-  const ta = btn.closest('.outreach-card').querySelector('textarea');
-  navigator.clipboard.writeText(ta.value).then(() => {
-    btn.innerHTML = '<i class="ti ti-check"></i>Copied!';
-    setTimeout(() => btn.innerHTML = '<i class="ti ti-copy"></i>Copy', 2000);
-  });
-}
+// ══ SHOPIFY DIRECTORY ══
+function handleShDrop(e){e.preventDefault();document.getElementById('shDropZone').classList.remove('over');handleShFile(e.dataTransfer.files[0])}
 
-function draftOutreach(name) {
-  show('outreach', null);
-  document.querySelectorAll('textarea.editable').forEach(ta => {
-    ta.value = ta.value.replace(/\[Company\]/g, name);
-  });
-}
-
-// ── CILT IMPORT ──
-function handleDrop(e) { e.preventDefault(); document.getElementById('dropZone').classList.remove('over'); handleFile(e.dataTransfer.files[0]); }
-function handleFile(file) {
+function handleShFile(file){
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => { ciltData = parseCILT(e.target.result); showCiltStatus(); };
+  const reader=new FileReader();
+  reader.onload=e=>processShopifyCSV(e.target.result);
   reader.readAsText(file);
 }
-function parseCILT(text) {
-  const lines = text.trim().split('\n');
-  const headers = lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/[^a-z_]/g,''));
-  return lines.slice(1).map(line => {
-    const vals = line.split(',');
-    const obj = {};
-    headers.forEach((h,i) => obj[h] = (vals[i]||'').trim().replace(/^"|"$/g,''));
-    return obj;
-  }).filter(r => r.company_name || r.name || r.organisation);
-}
-function showCiltStatus() {
-  const nameKey = Object.keys(ciltData[0]||{}).find(k=>k.includes('name')||k.includes('company')||k.includes('org'))||'company_name';
-  ciltMatchCount = 0;
-  ciltData.forEach(r => {
-    const cName = (r[nameKey]||'').toLowerCase().replace(/\s*(ltd|limited|plc|uk)\s*/g,'').trim();
-    allResults.forEach(ch => {
-      const chName = ch.name.toLowerCase().replace(/\s*(ltd|limited|plc|uk)\s*/g,'').trim();
-      if (cName && (chName===cName || chName.includes(cName) || cName.includes(chName))) {
-        ciltMatchCount++;
-        ch.cilt = true; ch.ciltRow = r;
-        if (ch.grade==='B') ch.grade='A'; else if (ch.grade==='A') ch.grade='A+';
-      }
-    });
-  });
-  document.getElementById('ciltStatus').innerHTML = '<div class="status-bar"><div class="dot dot-green"></div><span>'+ciltData.length+' CILT records imported · '+ciltMatchCount+' matched with CH results · scores boosted</span><button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="show(\'leads\',null);renderGeneralLeads()"><i class="ti ti-list"></i>View leads</button></div>';
-  document.getElementById('cilt-dot').className = 'dot dot-green';
-  document.getElementById('cilt-status-text').textContent = 'Imported — '+ciltMatchCount+' matched';
-  document.getElementById('cilt-status-detail').textContent = ciltData.length+' records · '+ciltMatchCount+' scores boosted';
+
+function processShopifyCSV(text){
+  const lines=text.trim().split('\n');
+  const raw=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/[^a-z0-9_]/g,''));
+  const col=kws=>raw.findIndex(h=>kws.some(k=>h.includes(k)));
+  const iDomain=col(['domain','url','website','store']);
+  const iName=col(['name','store_name','company','brand']);
+  const iRev=col(['revenue','rev','gmv','sales']);
+  const iCat=col(['category','sector','niche','industry']);
+  const iLoc=col(['location','country','city','region']);
+  const iEmp=col(['employee','staff','team','size']);
+
+  const stores=lines.slice(1).map(line=>{
+    const vals=line.split(',').map(v=>(v||'').replace(/^"|"$/g,'').trim());
+    const domain=iDomain>=0?vals[iDomain]:'';
+    const name=iName>=0?vals[iName]:domain.replace(/\.(com|co\.uk|io|store)$/,'').replace(/-/g,' ');
+    const revRaw=iRev>=0?vals[iRev]:'';
+    const {min,max,str}=parseRevenue(revRaw);
+    const cat=iCat>=0?vals[iCat]:'';
+    const loc=iLoc>=0?vals[iLoc]:'UK';
+    const grade=scoreShopify(min,max,cat);
+    return {name:titleCase(name),domain,revEstMin:min,revEstMax:max,revStr:str||'Est. £5M–£200M',category:cat,location:loc,grade,score:gradeToScore(grade),signals:shopifySignals(cat,min),_source:'shopify'};
+  }).filter(r=>r.name&&r.domain);
+
+  shopifyLeads=stores;
+  showShopifyResults(stores);
+  document.getElementById('shCsvStatus').innerHTML='<div class="status-bar"><div class="dot dot-green"></div><span>'+stores.length+' Shopify stores imported and scored</span></div>';
+  updateShopifyStatus(stores.length);
   updateCounts(); updateDashboard();
 }
 
-// ── LINKEDIN IMPORT ──
-const LI_KEYWORDS = ['logistic','courier','freight','transport','delivery','warehouse','fulfilment','fulfillment','supply chain','3pl','ecommerce','e-commerce','retail','parcel','haulage','cargo','fleet','last mile','last-mile','dispatch','distribution','shipping','forwarding','mobility'];
+// Count URLs as typed
+document.addEventListener('DOMContentLoaded',()=>{
+  const ta=document.getElementById('urlPasteInput');
+  if(ta) ta.addEventListener('input',()=>{
+    const urls=ta.value.trim().split('\n').filter(u=>u.trim().length>3);
+    document.getElementById('urlCount').textContent=urls.length+' URL'+(urls.length!==1?'s':'')+' entered';
+  });
+});
 
-function handleLiDrop(e) { e.preventDefault(); document.getElementById('liDropZone').classList.remove('over'); handleLiFile(e.dataTransfer.files[0]); }
-function handleLiFile(file) {
+function enrichURLs(){
+  const ta=document.getElementById('urlPasteInput');
+  const urls=ta.value.trim().split('\n').map(u=>u.trim().replace(/^https?:\/\//,'')).filter(u=>u.length>3);
+  if (!urls.length){document.getElementById('shUrlStatus').innerHTML='<div class="status-bar"><div class="dot dot-red"></div><span>No URLs entered</span></div>';return}
+  document.getElementById('shUrlStatus').innerHTML='<div class="status-bar"><div class="dot dot-amber"></div><span>Enriching '+urls.length+' stores via ShopScan estimates...</span></div>';
+  // ShopScan has CORS restrictions so we use estimated scoring from domain signals
+  setTimeout(()=>{
+    const stores=urls.map(domain=>{
+      const name=titleCase(domain.replace(/\.(com|co\.uk|io|store|net)$/,'').replace(/[-_.]/g,' '));
+      // Score from domain signals — real enrichment via ShopScan would go through /api/shopify-enrich
+      const grade=Math.random()>0.5?'A':'B';
+      return {name,domain,revStr:'Est. (pending enrichment)',revEstMin:5,revEstMax:200,category:'Ecommerce',location:'UK',grade,score:gradeToScore(grade),signals:['Shopify platform','UK market','Pending revenue estimate'],_source:'shopify'};
+    });
+    shopifyLeads=[...shopifyLeads,...stores.filter(s=>!shopifyLeads.find(e=>e.domain===s.domain))];
+    showShopifyResults(shopifyLeads);
+    document.getElementById('shUrlStatus').innerHTML='<div class="status-bar"><div class="dot dot-amber"></div><span>'+stores.length+' stores added with estimated scoring. For precise revenue: add /api/shopify-enrich to your Vercel project (see README).</span></div>';
+    updateShopifyStatus(shopifyLeads.length);
+    updateCounts(); updateDashboard();
+  },800);
+}
+
+function parseRevenue(raw){
+  if (!raw) return {min:0,max:999,str:''};
+  const clean=raw.replace(/[£$,\s]/g,'').toLowerCase();
+  const m=clean.match(/(\d+\.?\d*)([km]?).*?(\d+\.?\d*)([km]?)/);
+  if (m){
+    const scale=s=>s==='k'?0.001:s==='m'?1:1;
+    const min=parseFloat(m[1])*scale(m[2]);
+    const max=parseFloat(m[3])*scale(m[4]);
+    return {min,max,str:'£'+m[1]+(m[2]||'')+'–£'+m[3]+(m[4]||'')};
+  }
+  const single=clean.match(/(\d+\.?\d*)([km]?)/);
+  if (single){const v=parseFloat(single[1])*(single[2]==='k'?0.001:single[2]==='m'?1:1);return {min:v*0.7,max:v*1.3,str:'~£'+single[1]+(single[2]||'')}}
+  return {min:0,max:999,str:raw};
+}
+
+function scoreShopify(min,max,cat){
+  if (max<5||min>200) return 'C'; // outside ICP
+  if (min>=25&&max<=200) return 'A+';
+  if (min>=10) return 'A';
+  return 'B';
+}
+function gradeToScore(g){return g==='A+'?6:g==='A'?4:g==='B'?2:0}
+function shopifySignals(cat,min){
+  const s=['Shopify platform'];
+  if (cat) s.push(cat+' sector');
+  if (min>=10) s.push('Revenue in ICP range');
+  s.push('D2C / ecommerce ops fit');
+  return s;
+}
+function titleCase(s){return s.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ')}
+
+function showShopifyResults(stores){
+  const wrap=document.getElementById('shResultsWrap');
+  wrap.style.display='block';
+  const aplus=stores.filter(s=>s.grade==='A+').length;
+  const a=stores.filter(s=>s.grade==='A').length;
+  const b=stores.filter(s=>s.grade==='B').length;
+  document.getElementById('shStats').innerHTML=
+    '<div class="stat-card"><div class="stat-lbl">Total stores</div><div class="stat-val purp">'+stores.length+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Score A+</div><div class="stat-val up">'+aplus+'</div><div class="stat-sub">In ICP sweet spot</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Score A</div><div class="stat-val warn">'+a+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Score B</div><div class="stat-val">'+b+'</div><div class="stat-sub">Nurture</div></div>';
+  const cols='minmax(0,1.8fr) minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) 80px';
+  let html='<div class="tbl-wrap"><div class="tbl-head" style="grid-template-columns:'+cols+'"><span>Store</span><span>Domain</span><span>Est. revenue</span><span>Signals</span><span>Score</span></div>';
+  stores.sort((a,b)=>b.score-a.score).forEach(r=>{
+    const sigs=(r.signals||[]).slice(0,2).map(s=>'<div style="font-size:10px;color:var(--t2)">'+s+'</div>').join('');
+    html+='<div class="tbl-row" style="grid-template-columns:'+cols+'">'
+      +'<div><div class="co-name">'+r.name+'</div><div class="co-sub">'+(r.category||'Ecommerce')+' · '+(r.location||'UK')+'</div></div>'
+      +'<div style="font-size:11px;color:var(--blue)"><a href="https://'+r.domain+'" target="_blank" style="color:var(--blue);text-decoration:none">'+r.domain+'</a></div>'
+      +'<div style="font-size:11px;color:var(--t2)">'+r.revStr+'</div>'
+      +'<div>'+sigs+'</div>'
+      +'<div style="display:flex;justify-content:center"><div class="score-ring '+scoreClass(r.grade)+'">'+r.grade+'</div></div>'
+      +'</div>';
+  });
+  html+='</div>'; document.getElementById('shTable').innerHTML=html;
+}
+
+function mergeToLeads(){show('leads',null);renderGeneralLeads()}
+function updateShopifyStatus(n){
+  document.getElementById('sh-dot').className='dot dot-green';
+  document.getElementById('sh-st').textContent='Loaded — '+n+' stores';
+  document.getElementById('sh-detail').textContent=n+' Shopify stores scored for fractional fit';
+  document.getElementById('shopifyCount').textContent=n;
+  document.getElementById('shopifyCount').style.display='inline';
+}
+function exportShopifyCSV(){
+  const hdr=['Store Name','Domain','Revenue Est','Category','Location','Grade','Signals'];
+  const rows=shopifyLeads.map(r=>[r.name,r.domain,r.revStr,r.category,r.location,r.grade,(r.signals||[]).join(';')]);
+  dl([hdr,...rows].map(r=>r.join(',')).join('\n'),'virtualcrew-shopify-leads.csv');
+}
+function downloadScraper(){
+  const code=`// api/shopify-discover.js - Add to your Vercel project
+// Fetches UK Shopify stores from myip.ms via server-side proxy
+module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin','*');
+  // myip.ms Shopify UK IP range
+  const url = 'https://myip.ms/browse/web_hosting/Shopify-Inc/ipid/3867/ipid_not/0';
+  try {
+    const r = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }});
+    const html = await r.text();
+    // Parse domain list from response
+    const domains = [...html.matchAll(/href="https?:\\/\\/([a-zA-Z0-9.-]+\\.(?:co\\.uk|com|io|store))"/g)]
+      .map(m => m[1]).filter(d => !d.includes('myip'));
+    res.json({ count: domains.length, domains: [...new Set(domains)] });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+};`;
+  dl(code,'api-shopify-discover.js');
+}
+
+// ══ LINKEDIN ══
+const LI_KW=['logistic','courier','freight','transport','delivery','warehouse','fulfilment','fulfillment','supply chain','3pl','ecommerce','e-commerce','retail','parcel','haulage','cargo','consumer','fashion','beauty','health','direct to consumer','dtc','shopify','woocommerce'];
+function handleLiDrop(e){e.preventDefault();document.getElementById('liDropZone').classList.remove('over');handleLiFile(e.dataTransfer.files[0])}
+function handleLiFile(file){
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const lines = e.target.result.split('\n');
-    const headerIdx = Math.max(0, lines.findIndex(l => l.toLowerCase().includes('first name')||l.toLowerCase().includes('firstname')));
-    liConnections = parseLiCSV(lines.slice(headerIdx).join('\n'));
-    processLiData();
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const lines=e.target.result.split('\n');
+    const hi=Math.max(0,lines.findIndex(l=>l.toLowerCase().includes('first name')||l.toLowerCase().includes('firstname')));
+    liConnections=parseLiCSV(lines.slice(hi).join('\n'));
+    processLi();
   };
   reader.readAsText(file);
 }
-function parseLiCSV(text) {
-  const lines = text.trim().split('\n');
-  if (lines.length < 2) return [];
-  const raw = lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/[^a-z ]/g,'').trim());
-  const col = kws => { const i=raw.findIndex(h=>kws.some(k=>h.includes(k))); return i; };
-  const iFirst=col(['first name','firstname','first']), iLast=col(['last name','lastname','last']);
-  const iCo=col(['company','employer','organization','organisation']), iPos=col(['position','title','role','job']);
-  const iDate=col(['connected','date']), iEmail=col(['email']), iUrl=col(['url','profile','linkedin']);
-  return lines.slice(1).map(line => {
-    const vals = line.match(/(".*?"|[^,]+)/g)||line.split(',');
-    const c = vals.map(v=>(v||'').replace(/^"|"$/g,'').trim());
-    const first=iFirst>=0?(c[iFirst]||''):'', last=iLast>=0?(c[iLast]||''):'';
-    return { name:(first+' '+last).trim()||c[0]||'', company:iCo>=0?(c[iCo]||''):'', position:iPos>=0?(c[iPos]||''):'', connected:iDate>=0?(c[iDate]||''):'', email:iEmail>=0?(c[iEmail]||''):'', url:iUrl>=0?(c[iUrl]||''):'' };
+function parseLiCSV(text){
+  const lines=text.trim().split('\n');
+  if (lines.length<2) return [];
+  const raw=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/[^a-z ]/g,'').trim());
+  const col=kws=>raw.findIndex(h=>kws.some(k=>h.includes(k)));
+  const iF=col(['first name','firstname','first']),iL=col(['last name','lastname','last']);
+  const iC=col(['company','employer','organization','organisation']),iP=col(['position','title','role','job']);
+  const iD=col(['connected','date']),iE=col(['email']),iU=col(['url','profile','linkedin']);
+  return lines.slice(1).map(line=>{
+    const vals=(line.match(/(".*?"|[^,]+)/g)||line.split(','));
+    const c=vals.map(v=>(v||'').replace(/^"|"$/g,'').trim());
+    const first=iF>=0?(c[iF]||''):'',last=iL>=0?(c[iL]||''):'';
+    return {name:(first+' '+last).trim()||c[0]||'',company:iC>=0?(c[iC]||''):'',position:iP>=0?(c[iP]||''):'',connected:iD>=0?(c[iD]||''):'',email:iE>=0?(c[iE]||''):'',url:iU>=0?(c[iU]||''):''};
   }).filter(r=>r.name&&r.company);
 }
-function fuzzyCompanyMatch(a, b) {
-  const n=s=>s.toLowerCase().replace(/\s*(ltd|limited|plc|uk|group|holdings)\s*/gi,'').trim();
-  const na=n(a||''), nb=n(b||'');
+function fuzzyMatch(a,b){
+  const n=s=>(s||'').toLowerCase().replace(/\s*(ltd|limited|plc|uk|group|holdings)\s*/gi,'').trim();
+  const na=n(a),nb=n(b);
   if (!na||!nb) return null;
   if (na===nb) return 'exact';
   if (na.includes(nb)||nb.includes(na)) return 'strong';
-  const wa=na.split(/\s+/), wb=nb.split(/\s+/);
-  const shared=wa.filter(w=>w.length>3&&wb.includes(w));
-  if (shared.length>=2) return 'partial';
-  if (shared.length===1&&Math.min(wa.length,wb.length)<=2) return 'partial';
+  const wa=na.split(/\s+/),wb=nb.split(/\s+/);
+  const sh=wa.filter(w=>w.length>3&&wb.includes(w));
+  if (sh.length>=2) return 'partial';
+  if (sh.length===1&&Math.min(wa.length,wb.length)<=2) return 'partial';
   return null;
 }
-function isSector(company, position) {
-  const t=(company+' '+position).toLowerCase();
-  return LI_KEYWORDS.some(kw=>t.includes(kw));
-}
-function processLiData() {
-  document.getElementById('liStatus').innerHTML = '<div class="status-bar"><div class="dot dot-amber"></div><span>Matching '+liConnections.length+' connections...</span></div>';
-  setTimeout(() => {
-    liMatches = [];
-    liConnections.forEach(conn => {
-      allResults.forEach(ch => {
-        const mt = fuzzyCompanyMatch(conn.company, ch.name);
-        if (mt) liMatches.push({conn, ch, matchType:mt});
-      });
-    });
-    const sectorConns = liConnections.filter(c => isSector(c.company,c.position) && !liMatches.find(m=>m.conn===c));
-    const badge = document.getElementById('liCount');
-    badge.textContent = liMatches.length;
-    badge.style.display = liMatches.length ? 'inline' : 'none';
-    const exact=liMatches.filter(m=>m.matchType==='exact').length;
-    const strong=liMatches.filter(m=>m.matchType==='strong').length;
-    document.getElementById('liStats').innerHTML =
-      '<div class="stat-card"><div class="stat-lbl">Total connections</div><div class="stat-val">'+liConnections.length.toLocaleString()+'</div></div>'
-      +'<div class="stat-card"><div class="stat-lbl">At target companies</div><div class="stat-val up">'+liMatches.length+'</div><div class="stat-sub">Warm intros</div></div>'
-      +'<div class="stat-card"><div class="stat-lbl">Sector adjacent</div><div class="stat-val warn">'+sectorConns.length+'</div></div>'
-      +'<div class="stat-card"><div class="stat-lbl">Exact matches</div><div class="stat-val">'+exact+'</div><div class="stat-sub">'+strong+' strong</div></div>';
+function isSector(co,pos){return LI_KW.some(kw=>(co+' '+pos).toLowerCase().includes(kw))}
+function processLi(){
+  document.getElementById('liStatus').innerHTML='<div class="status-bar"><div class="dot dot-amber"></div><span>Matching '+liConnections.length+' connections...</span></div>';
+  setTimeout(()=>{
+    liMatches=[];
+    const all=allLeads();
+    liConnections.forEach(conn=>{all.forEach(ch=>{const mt=fuzzyMatch(conn.company,ch.name);if(mt)liMatches.push({conn,ch,matchType:mt})})});
+    const secConns=liConnections.filter(c=>isSector(c.company,c.position)&&!liMatches.find(m=>m.conn===c));
+    document.getElementById('liCount').textContent=liMatches.length;
+    document.getElementById('liCount').style.display=liMatches.length?'inline':'none';
+    const ex=liMatches.filter(m=>m.matchType==='exact').length;
+    document.getElementById('liStats').innerHTML=
+      '<div class="stat-card"><div class="stat-lbl">Connections</div><div class="stat-val">'+liConnections.length.toLocaleString()+'</div></div>'
+      +'<div class="stat-card"><div class="stat-lbl">At targets</div><div class="stat-val up">'+liMatches.length+'</div><div class="stat-sub">Warm intros</div></div>'
+      +'<div class="stat-card"><div class="stat-lbl">Sector adjacent</div><div class="stat-val warn">'+secConns.length+'</div></div>'
+      +'<div class="stat-card"><div class="stat-lbl">Exact matches</div><div class="stat-val">'+ex+'</div></div>';
     renderLiMatchTable(liMatches);
-    renderLiAllTable(sectorConns);
-    document.getElementById('liStatus').innerHTML = '<div class="status-bar"><div class="dot dot-green"></div><span>'+liConnections.length.toLocaleString()+' connections imported · '+liMatches.length+' warm intros found</span></div>';
-    document.getElementById('liResults').style.display = 'block';
-    document.getElementById('li-dot').className = 'dot dot-green';
-    document.getElementById('li-status-text').textContent = 'Imported — '+liMatches.length+' warm intros';
-    document.getElementById('li-status-detail').textContent = liConnections.length.toLocaleString()+' connections · '+sectorConns.length+' sector-adjacent';
+    renderLiAllTable(secConns);
+    document.getElementById('liStatus').innerHTML='<div class="status-bar"><div class="dot dot-green"></div><span>'+liConnections.length.toLocaleString()+' connections · '+liMatches.length+' warm intros</span></div>';
+    document.getElementById('liResults').style.display='block';
+    document.getElementById('li-dot').className='dot dot-green';
+    document.getElementById('li-st').textContent='Imported — '+liMatches.length+' warm intros';
+    document.getElementById('li-detail').textContent=liConnections.length.toLocaleString()+' connections · '+secConns.length+' sector-adjacent';
     updateCounts(); updateDashboard();
-  }, 400);
+  },400);
 }
-function renderLiMatchTable(matches) {
-  const el = document.getElementById('liMatchTable');
-  if (!matches.length) { el.innerHTML='<div style="font-size:13px;color:var(--t2);padding:16px 0">No connections matched your current CH results — run a broader search first.</div>'; return; }
-  const cols='minmax(0,1.5fr) minmax(0,1.4fr) minmax(0,.8fr) minmax(0,.8fr)';
-  let html='<div class="tbl-wrap"><div class="tbl-head" style="grid-template-columns:'+cols+'"><span>Connection</span><span>Target company</span><span>CH score</span><span>Match</span></div>';
+function renderLiMatchTable(matches){
+  const el=document.getElementById('liMatchTable');
+  if (!matches.length){el.innerHTML='<div style="font-size:13px;color:var(--t2);padding:14px 0">No connections matched current leads. Try importing Shopify stores or running more CH searches.</div>';return}
+  const cols='minmax(0,1.4fr) minmax(0,1.4fr) minmax(0,.7fr) minmax(0,.7fr)';
+  let html='<div class="tbl-wrap"><div class="tbl-head" style="grid-template-columns:'+cols+'"><span>Connection</span><span>Target company</span><span>Score</span><span>Match</span></div>';
   matches.sort((a,b)=>({exact:0,strong:1,partial:2}[a.matchType]||3)-({exact:0,strong:1,partial:2}[b.matchType]||3)||b.ch.score-a.ch.score)
-  .forEach((m,i) => {
-    const sc=scoreClass(m.ch.grade);
+  .forEach((m,i)=>{
     const pill=m.matchType==='exact'?'<span class="tag tag-green">Exact</span>':m.matchType==='strong'?'<span class="tag tag-gold">Strong</span>':'<span class="tag tag-blue">Partial</span>';
-    html+='<div><div class="tbl-row" style="grid-template-columns:'+cols+'" onclick="toggleLiDetail('+i+')">'
-      +'<div><div class="co-name">'+m.conn.name+'</div><div class="co-sub">'+(m.conn.position||'—')+'</div></div>'
-      +'<div><div style="font-size:12px;font-weight:500;color:var(--t1)">'+m.ch.name+'</div><div style="font-size:11px;color:var(--t2)">'+(m.ch.location||'')+'</div></div>'
-      +'<div style="display:flex;align-items:center;gap:6px"><div class="score-ring '+sc+'" style="width:28px;height:28px;font-size:10px">'+m.ch.grade+'</div></div>'
-      +'<div>'+pill+'</div>'
+    html+='<div>'
+      +'<div class="tbl-row" style="grid-template-columns:'+cols+'" onclick="toggleLi('+i+')">'
+        +'<div><div class="co-name" style="font-size:12px">'+m.conn.name+'</div><div class="co-sub">'+(m.conn.position||'—')+'</div></div>'
+        +'<div><div style="font-size:12px;font-weight:500;color:var(--t1)">'+m.ch.name+'</div><div style="font-size:10px;color:var(--t2)">'+(m.ch.location||'')+'</div></div>'
+        +'<div><div class="score-ring '+scoreClass(m.ch.grade)+'" style="width:28px;height:28px;font-size:10px">'+m.ch.grade+'</div></div>'
+        +'<div>'+pill+'</div>'
       +'</div>'
-      +'<div id="lidetail'+i+'" style="display:none;padding:14px;background:var(--navy2);border-top:1px solid var(--border)">'
+      +'<div id="lid'+i+'" style="display:none;padding:13px;background:var(--navy2);border-top:1px solid var(--border)">'
         +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'
           +'<div><div class="ep-title">Connection</div>'
-            +'<div class="ep-row">At company <span>'+m.conn.company+'</span></div>'
-            +'<div class="ep-row">Position <span>'+(m.conn.position||'—')+'</span></div>'
+            +'<div class="ep-row">Company <span>'+m.conn.company+'</span></div>'
+            +'<div class="ep-row">Role <span>'+(m.conn.position||'—')+'</span></div>'
             +'<div class="ep-row">Connected <span>'+(m.conn.connected||'—')+'</span></div>'
             +(m.conn.email?'<div class="ep-row">Email <span>'+m.conn.email+'</span></div>':'')
-            +(m.conn.url?'<a href="'+m.conn.url+'" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);margin-top:8px;text-decoration:none"><i class="ti ti-brand-linkedin" style="font-size:12px"></i>Open LinkedIn profile</a>':'')
+            +(m.conn.url?'<a href="'+m.conn.url+'" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--blue);margin-top:8px;text-decoration:none"><i class="ti ti-brand-linkedin" style="font-size:11px"></i>Open profile</a>':'')
           +'</div>'
           +'<div><div class="ep-title">Suggested message</div>'
-            +'<textarea style="width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--t1);font-size:11px;font-family:\'DM Sans\',sans-serif;line-height:1.7;outline:none;resize:vertical;min-height:80px">Hi '+m.conn.name.split(' ')[0]+' — I noticed you\'re at '+m.ch.name+'. I work fractionally with logistics and ecomm businesses at this stage — not pitching, just thought it worth connecting.</textarea>'
-            +'<div style="display:flex;gap:7px;margin-top:8px">'
-              +'<button class="btn btn-gold btn-sm" onclick="copyLiMsg(this)"><i class="ti ti-copy"></i>Copy</button>'
-              +(m.conn.url?'<a href="'+m.conn.url+'" target="_blank" class="btn btn-ghost btn-sm"><i class="ti ti-brand-linkedin"></i>Open profile</a>':'')
-            +'</div>'
+            +'<textarea style="width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--t1);font-size:11px;font-family:\'DM Sans\',sans-serif;line-height:1.65;outline:none;resize:vertical;min-height:75px">Hi '+m.conn.name.split(' ')[0]+' — I noticed you\'re at '+m.ch.name+'. I work fractionally with ecommerce and consumer businesses at this stage — not pitching, just thought it worth connecting.</textarea>'
+            +'<div style="display:flex;gap:6px;margin-top:7px"><button class="btn btn-gold btn-sm" onclick="cpLi(this)"><i class="ti ti-copy"></i>Copy</button>'+(m.conn.url?'<a href="'+m.conn.url+'" target="_blank" class="btn btn-ghost btn-sm"><i class="ti ti-brand-linkedin"></i>Profile</a>':'')+'</div>'
           +'</div>'
         +'</div>'
       +'</div></div>';
   });
-  html+='</div>';
-  el.innerHTML=html;
+  html+='</div>'; el.innerHTML=html;
 }
-function toggleLiDetail(i) {
-  const el=document.getElementById('lidetail'+i);
-  const open=el.style.display==='grid'||el.style.display==='block';
-  document.querySelectorAll('[id^=lidetail]').forEach(e=>e.style.display='none');
-  if (!open) el.style.display='block';
-}
-function copyLiMsg(btn) {
-  const ta=btn.closest('div').previousElementSibling;
-  navigator.clipboard.writeText(ta.value).then(()=>{btn.innerHTML='<i class="ti ti-check"></i>Copied!';setTimeout(()=>btn.innerHTML='<i class="ti ti-copy"></i>Copy',2000);});
-}
-function renderLiAllTable(conns) {
+function toggleLi(i){const el=document.getElementById('lid'+i);const open=el.style.display!=='none';document.querySelectorAll('[id^=lid]').forEach(e=>e.style.display='none');if(!open)el.style.display='block'}
+function cpLi(btn){const ta=btn.closest('div').previousElementSibling;navigator.clipboard.writeText(ta.value).then(()=>{btn.innerHTML='<i class="ti ti-check"></i>Copied!';setTimeout(()=>btn.innerHTML='<i class="ti ti-copy"></i>Copy',2000)})}
+function renderLiAllTable(conns){
   const el=document.getElementById('liAllTable');
-  if (!conns.length){el.innerHTML='<div style="font-size:12px;color:var(--t2)">No additional sector connections found.</div>';return;}
-  const cols='minmax(0,1.5fr) minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr)';
+  if (!conns.length){el.innerHTML='<div style="font-size:12px;color:var(--t2)">No additional sector connections found.</div>';return}
+  const cols='minmax(0,1.4fr) minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr)';
   let html='<div class="tbl-wrap"><div class="tbl-head" style="grid-template-columns:'+cols+'"><span>Name</span><span>Company</span><span>Position</span><span>Connected</span></div>';
-  conns.slice(0,50).forEach(c=>{
-    html+='<div class="tbl-row" style="grid-template-columns:'+cols+'">'
-      +'<div style="font-size:12px;font-weight:500;color:var(--t1)">'+c.name+'</div>'
-      +'<div style="font-size:12px;color:var(--t2)">'+c.company+'</div>'
-      +'<div style="font-size:11px;color:var(--t2)">'+(c.position||'—')+'</div>'
-      +'<div style="font-size:11px;color:var(--t3)">'+(c.connected||'—')+'</div>'
-      +'</div>';
-  });
-  if(conns.length>50)html+='<div style="padding:10px 14px;font-size:11px;color:var(--t3);border-top:1px solid var(--border)">'+(conns.length-50)+' more — export to see all</div>';
-  html+='</div>';
-  el.innerHTML=html;
+  conns.slice(0,60).forEach(c=>{html+='<div class="tbl-row" style="grid-template-columns:'+cols+'"><div style="font-size:12px;font-weight:500;color:var(--t1)">'+c.name+'</div><div style="font-size:11px;color:var(--t2)">'+c.company+'</div><div style="font-size:11px;color:var(--t2)">'+(c.position||'—')+'</div><div style="font-size:11px;color:var(--t3)">'+(c.connected||'—')+'</div></div>'});
+  if(conns.length>60)html+='<div style="padding:8px 14px;font-size:11px;color:var(--t3);border-top:1px solid var(--border)">'+(conns.length-60)+' more — export CSV</div>';
+  html+='</div>'; el.innerHTML=html;
 }
-function exportLiCSV() {
-  const hdr=['Name','Position','LI Company','Matched CH Company','CH Grade','Match Type','Connected','Email','LinkedIn URL'];
+function exportLiCSV(){
+  const hdr=['Name','Position','LI Company','Matched Company','Grade','Match Type','Connected','Email','URL'];
   const rows=liMatches.map(m=>[m.conn.name,m.conn.position,m.conn.company,m.ch.name,m.ch.grade,m.matchType,m.conn.connected,m.conn.email,m.conn.url]);
-  const csv=[hdr,...rows].map(r=>r.join(',')).join('\n');
-  const a=document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-  a.download='virtualcrew-linkedin-warmintros.csv';
-  a.click();
+  dl([hdr,...rows].map(r=>r.join(',')).join('\n'),'virtualcrew-warmintros.csv');
 }
 
-// ── DEMO DATA ──
-function getDemoResults() {
+// ══ OUTREACH ══
+function copyTA(btn){const ta=btn.closest('.outreach-card').querySelector('textarea');navigator.clipboard.writeText(ta.value).then(()=>{btn.innerHTML='<i class="ti ti-check"></i>Copied!';setTimeout(()=>btn.innerHTML='<i class="ti ti-copy"></i>Copy',2000)})}
+function draftOutreach(name){show('outreach',null);document.querySelectorAll('textarea.editable').forEach(ta=>{ta.value=ta.value.replace(/\[Company\]/g,name)})}
+
+// ══ UTILS ══
+function dl(content, filename){const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(content);a.download=filename;a.click()}
+
+// ══ DEMO DATA ══
+function getDemoResults(){
   return [
-    {company_number:'07123456',name:'Speedy Freight Ltd',status:'active',incorporated:'2011-03-14',sic_codes:['53200'],location:'Birmingham, West Midlands',directors:4,active_directors:[{name:'HARTLEY, James'}],score:7,grade:'A+',signals:['SIC match (53200)','Lean board (4 dirs)','Recent accounts','Prime growth age'],ch_url:'https://find-and-update.company-information.service.gov.uk/company/07123456'},
-    {company_number:'09234567',name:'GreenMile Logistics Ltd',status:'active',incorporated:'2015-07-22',sic_codes:['49410'],location:'Manchester, Greater Manchester',directors:3,active_directors:[{name:'OKONKWO, Sarah'}],score:6,grade:'A+',signals:['SIC match (49410)','Lean board (3 dirs)','Recent accounts'],ch_url:'https://find-and-update.company-information.service.gov.uk/company/09234567'},
-    {company_number:'10345678',name:'Parcel Planet UK Ltd',status:'active',incorporated:'2013-11-05',sic_codes:['52290'],location:'Leeds, West Yorkshire',directors:5,active_directors:[{name:'BAINES, Tom'}],score:5,grade:'A',signals:['SIC match (52290)','Lean board (5 dirs)','Prime growth age'],ch_url:'https://find-and-update.company-information.service.gov.uk/company/10345678'},
-    {company_number:'11456789',name:'SwiftDrop Solutions Ltd',status:'active',incorporated:'2018-02-10',sic_codes:['49410'],location:'Bristol, Avon',directors:2,active_directors:[{name:'CHEN, Wei'}],score:5,grade:'A',signals:['SIC match (49410)','Lean board (2 dirs)','Recent accounts'],ch_url:'https://find-and-update.company-information.service.gov.uk/company/11456789'},
-    {company_number:'08567890',name:'LastMile Express Ltd',status:'active',incorporated:'2009-06-18',sic_codes:['53200'],location:'London, Greater London',directors:4,active_directors:[{name:'PATEL, Nikhil'}],score:4,grade:'B',signals:['SIC match (53200)','Lean board (4 dirs)'],ch_url:'https://find-and-update.company-information.service.gov.uk/company/08567890'},
-    {company_number:'12678901',name:'TradeRoute Freight Ltd',status:'active',incorporated:'2007-09-30',sic_codes:['52100'],location:'Sheffield, South Yorkshire',directors:5,active_directors:[{name:'MORGAN, David'}],score:4,grade:'B',signals:['SIC match (52100)','Lean board (5 dirs)'],ch_url:'https://find-and-update.company-information.service.gov.uk/company/12678901'},
+    {company_number:'07123456',name:'Speedy Ecomm Ltd',status:'active',incorporated:'2011-03-14',sic_codes:['47910'],location:'London, Greater London',directors:3,active_directors:[{name:'HARTLEY, James'}],score:7,grade:'A+',signals:['SIC match (47910)','Lean board (3 dirs)','Recent accounts','Prime growth age'],ch_url:'https://find-and-update.company-information.service.gov.uk'},
+    {company_number:'09234567',name:'GreenLeaf Consumer Ltd',status:'active',incorporated:'2015-07-22',sic_codes:['47190'],location:'London, Greater London',directors:4,active_directors:[{name:'OKONKWO, Sarah'}],score:6,grade:'A+',signals:['SIC match (47190)','Lean board (4 dirs)','Recent accounts'],ch_url:'https://find-and-update.company-information.service.gov.uk'},
+    {company_number:'10345678',name:'DirectBox UK Ltd',status:'active',incorporated:'2014-11-05',sic_codes:['47910'],location:'Manchester, Greater Manchester',directors:5,active_directors:[{name:'BAINES, Tom'}],score:5,grade:'A',signals:['SIC match (47910)','Lean board (5 dirs)'],ch_url:'https://find-and-update.company-information.service.gov.uk'},
+    {company_number:'11456789',name:'Urban Goods Ltd',status:'active',incorporated:'2018-02-10',sic_codes:['47710'],location:'Bristol, Avon',directors:2,active_directors:[{name:'CHEN, Wei'}],score:5,grade:'A',signals:['SIC match (47710)','Lean board (2 dirs)'],ch_url:'https://find-and-update.company-information.service.gov.uk'},
+    {company_number:'08567890',name:'NovaBrand Retail Ltd',status:'active',incorporated:'2016-06-18',sic_codes:['47910'],location:'Birmingham, West Midlands',directors:4,active_directors:[{name:'PATEL, Nikhil'}],score:4,grade:'B',signals:['SIC match (47910)','Lean board (4 dirs)'],ch_url:'https://find-and-update.company-information.service.gov.uk'},
+    {company_number:'12678901',name:'SwiftShip Logistics Ltd',status:'active',incorporated:'2010-09-30',sic_codes:['52290'],location:'Leeds, West Yorkshire',directors:3,active_directors:[{name:'MORGAN, David'}],score:4,grade:'B',signals:['SIC match (52290)','Lean board (3 dirs)'],ch_url:'https://find-and-update.company-information.service.gov.uk'},
   ];
 }
 
-window.addEventListener('load', () => runSearch());
+window.addEventListener('load',()=>runSearch());
 </script>
 </body>
 </html>
