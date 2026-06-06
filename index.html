@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VirtualCrew — Lead Intelligence Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.22.0/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #0a0f1e;
+    --navy2:   #111827;
+    --navy3:   #1a2235;
+    --navy4:   #222f47;
+    --gold:    #c9a84c;
+    --gold-l:  #f0d080;
+    --gold-d:  #7a6330;
+    --teal:    #2dd4bf;
+    --green:   #34d399;
+    --red:     #f87171;
+    --blue:    #93c5fd;
+    --t1:      #e8eaf0;
+    --t2:      #8a94a8;
+    --t3:      #4a5568;
+    --border:  rgba(201,168,76,.15);
+    --bh:      rgba(201,168,76,.35);
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--t1); min-height: 100vh; }
+
+  /* ── LAYOUT ── */
+  .shell { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+  .topbar {
+    height: 58px; min-height: 58px; background: var(--navy2); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 16px;
+  }
+  .logo-mark {
+    width: 30px; height: 30px; background: var(--gold); border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12px; color: var(--navy);
+    flex-shrink: 0;
+  }
+  .logo-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px; }
+  .logo-sub  { font-size: 11px; color: var(--gold); margin-top: 1px; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .live-pill {
+    display: flex; align-items: center; gap: 5px; padding: 4px 10px;
+    border-radius: 20px; border: 1px solid rgba(45,212,191,.3);
+    background: rgba(45,212,191,.07); font-size: 11px; color: var(--teal); font-weight: 500;
+  }
+  .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .body { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 240px; min-width: 240px; background: var(--navy2);
+    border-right: 1px solid var(--border); display: flex; flex-direction: column;
+    overflow-y: auto;
+  }
+  .sb-section { padding: 14px 14px 4px; font-size: 10px; font-weight: 600; color: var(--t3); letter-spacing: .08em; text-transform: uppercase; }
+  .sb-item {
+    display: flex; align-items: center; gap: 9px; padding: 8px 14px;
+    font-size: 13px; color: var(--t2); border-left: 2px solid transparent; cursor: pointer;
+    transition: all .15s;
+  }
+  .sb-item:hover { color: var(--t1); background: rgba(201,168,76,.05); }
+  .sb-item.active { color: var(--gold); background: rgba(201,168,76,.08); border-left-color: var(--gold); }
+  .sb-badge {
+    margin-left: auto; font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 10px; background: var(--gold-d); color: var(--gold-l);
+  }
+  .icp-box {
+    margin: 12px; background: rgba(201,168,76,.05); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; font-size: 11px; color: var(--t2); line-height: 1.8;
+  }
+  .icp-box .icp-title { font-size: 10px; font-weight: 600; color: var(--gold); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+
+  /* ── CONTENT ── */
+  .content { flex: 1; overflow-y: auto; padding: 24px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── SEARCH BAR ── */
+  .search-card {
+    background: var(--navy3); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; margin-bottom: 20px;
+  }
+  .search-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .search-input {
+    flex: 1; min-width: 200px; background: var(--navy2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; color: var(--t1); font-size: 13px;
+    font-family: 'DM Sans', sans-serif; outline: none; transition: border-color .2s;
+  }
+  .search-input:focus { border-color: var(--bh); }
+  .search-input::placeholder { color: var(--t3); }
+
+  select.search-sel {
+    background: var(--navy2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 12px; color: var(--t1); font-size: 13px; font-family: 'DM Sans', sans-serif;
+    outline: none; cursor: pointer;
+  }
+  .btn {
+    padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px; border: none; transition: all .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-gold { background: var(--gold); color: var(--navy); }
+  .btn-gold:hover { background: var(--gold-l); }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--t2); }
+  .btn-ghost:hover { border-color: var(--bh); color: var(--t1); background: var(--navy3); }
+  .btn-sm { padding: 5px 11px; font-size: 11px; }
+
+  .chips { display: flex; gap: 7px; flex-wrap: wrap; }
+  .chip {
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; cursor: pointer;
+    border: 1px solid var(--border); color: var(--t2); background: transparent; transition: all .15s;
+  }
+  .chip:hover { border-color: var(--bh); color: var(--t1); }
+  .chip.on { background: rgba(201,168,76,.1); border-color: rgba(201,168,76,.4); color: var(--gold); }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    display: flex; align-items: center; gap: 10px; padding: 9px 14px;
+    border-radius: 8px; border: 1px solid var(--border); background: var(--navy3);
+    font-size: 12px; color: var(--t2); margin-bottom: 16px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-amber { background: #fbbf24; animation: pulse 1.2s infinite; }
+  .dot-green { background: var(--green); }
+  .dot-red   { background: var(--red); }
+  .dot-gray  { background: var(--t3); }
+  .progress  { flex: 1; height: 3px; background: var(--navy4); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width .4s; }
+
+  /* ── RESULTS TABLE ── */
+  .results-wrap {
+    background: var(--navy3); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  }
+  .results-header {
+    display: grid; grid-template-columns: minmax(0,2.4fr) minmax(0,1fr) minmax(0,.7fr) minmax(0,1fr) minmax(0,.9fr) 100px;
+    gap: 10px; padding: 10px 16px; background: var(--navy2); border-bottom: 1px solid var(--border);
+  }
+  .results-header span { font-size: 10px; font-weight: 600; color: var(--t3); text-transform: uppercase; letter-spacing: .06em; }
+  .result-row {
+    display: grid; grid-template-columns: minmax(0,2.4fr) minmax(0,1fr) minmax(0,.7fr) minmax(0,1fr) minmax(0,.9fr) 100px;
+    gap: 10px; padding: 12px 16px; border-top: 1px solid var(--border); align-items: center;
+    transition: background .1s; cursor: pointer;
+  }
+  .result-row:hover { background: var(--navy4); }
+  .co-name { font-size: 13px; font-weight: 600; color: var(--t1); }
+  .co-sub  { font-size: 11px; color: var(--t2); margin-top: 2px; }
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 500;
+  }
+  .tag-gold  { background: rgba(201,168,76,.1); color: var(--gold); border: 1px solid rgba(201,168,76,.25); }
+  .tag-teal  { background: rgba(45,212,191,.08); color: var(--teal); border: 1px solid rgba(45,212,191,.2); }
+  .tag-red   { background: rgba(248,113,113,.08); color: var(--red); border: 1px solid rgba(248,113,113,.2); }
+  .tag-blue  { background: rgba(147,197,253,.07); color: var(--blue); border: 1px solid rgba(147,197,253,.2); }
+  .tag-gray  { background: rgba(139,148,170,.1); color: var(--t2); border: 1px solid rgba(139,148,170,.2); }
+  .score-ring {
+    width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700;
+  }
+  .score-aplus { background: rgba(52,211,153,.15); color: var(--green); border: 1.5px solid rgba(52,211,153,.35); }
+  .score-a    { background: rgba(201,168,76,.15); color: var(--gold); border: 1.5px solid rgba(201,168,76,.4); }
+  .score-b    { background: rgba(45,212,191,.1); color: var(--teal); border: 1.5px solid rgba(45,212,191,.3); }
+  .score-c    { background: rgba(139,148,170,.1); color: var(--t2); border: 1.5px solid rgba(139,148,170,.2); }
+
+  .expand-panel {
+    display: none; padding: 16px; background: var(--navy2);
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    grid-template-columns: 1fr 1fr 1fr; gap: 16px;
+  }
+  .expand-panel.open { display: grid; }
+  .ep-title { font-size: 10px; font-weight: 600; color: var(--t3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  .ep-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--t2); padding: 3px 0; }
+  .ep-row span { color: var(--t1); font-weight: 500; }
+  .signal-list { font-size: 11px; color: var(--t2); }
+  .signal-item { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+  .signal-item::before { content: "✓"; color: var(--green); font-size: 11px; }
+
+  /* ── CILT IMPORT ── */
+  .drop-zone {
+    border: 1.5px dashed var(--border); border-radius: 10px; padding: 28px;
+    text-align: center; cursor: pointer; transition: all .2s; background: var(--navy3);
+  }
+  .drop-zone:hover, .drop-zone.over { border-color: var(--bh); background: var(--navy4); }
+
+  /* ── STATS ROW ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--navy3); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .stat-val { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 600; color: var(--t1); }
+  .stat-lbl { font-size: 10px; font-weight: 600; color: var(--t3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .stat-sub { font-size: 11px; color: var(--t2); margin-top: 4px; }
+  .up   { color: var(--green); }
+  .warn { color: var(--gold); }
+
+  /* ── OUTREACH PANEL ── */
+  .outreach-card { background: var(--navy3); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 14px; }
+  .oc-label { font-size: 10px; font-weight: 600; color: var(--gold); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+  .oc-title { font-size: 14px; font-weight: 600; color: var(--t1); margin-bottom: 8px; }
+  .oc-body  { font-size: 12px; color: var(--t2); line-height: 1.75; border-top: 1px solid var(--border); padding-top: 10px; }
+  .oc-body em { color: var(--gold); font-style: normal; font-weight: 500; }
+  textarea.editable {
+    width: 100%; background: var(--navy2); border: 1px solid var(--border); border-radius: 7px;
+    padding: 10px 12px; color: var(--t1); font-size: 12px; font-family: 'DM Sans', sans-serif;
+    line-height: 1.7; outline: none; resize: vertical; margin-top: 10px; min-height: 110px;
+  }
+  textarea.editable:focus { border-color: var(--bh); }
+
+  .scrollbar ::-webkit-scrollbar { width: 4px; } 
+  .scrollbar ::-webkit-scrollbar-thumb { background: var(--navy4); border-radius: 2px; }
+
+  /* ── DEPLOY GUIDE ── */
+  .step-row { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+  .step-num {
+    width: 26px; height: 26px; border-radius: 50%; background: var(--navy3);
+    border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--t1); flex-shrink: 0; margin-top: 1px;
+  }
+  .step-body { font-size: 13px; color: var(--t2); line-height: 1.65; }
+  .step-body strong { color: var(--t1); font-weight: 500; }
+  code {
+    background: var(--navy2); border: 1px solid var(--border); border-radius: 4px;
+    padding: 1px 7px; font-family: 'Courier New', monospace; font-size: 12px; color: var(--gold-l);
+  }
+  pre {
+    background: var(--navy2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px 16px; font-family: 'Courier New', monospace; font-size: 12px; color: var(--gold-l);
+    overflow-x: auto; margin: 8px 0 14px; line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="logo-mark">VC</div>
+    <div>
+      <div class="logo-name">VirtualCrew</div>
+      <div class="logo-sub">Lead Intelligence Agent</div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-pill"><div class="pulse"></div>Companies House live</div>
+      <a href="https://linkedin.com" target="_blank" style="padding:6px 13px;border-radius:7px;border:1px solid rgba(10,102,194,.4);background:rgba(10,102,194,.1);color:#93c5fd;font-size:12px;font-weight:500;text-decoration:none;display:flex;align-items:center;gap:6px"><i class="ti ti-brand-linkedin" style="font-size:14px"></i>Connect on LinkedIn</a>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sb-section">Intelligence</div>
+      <div class="sb-item active" onclick="show('search',this)"><i class="ti ti-search" style="font-size:14px"></i>CH Live Search</div>
+      <div class="sb-item" onclick="show('leads',this)"><i class="ti ti-crosshair" style="font-size:14px"></i>Hot Leads <span class="sb-badge" id="leadCount">0</span></div>
+      <div class="sb-item" onclick="show('cilt',this)"><i class="ti ti-truck" style="font-size:14px"></i>CILT Import</div>
+      <div class="sb-section" style="margin-top:8px">Outreach</div>
+      <div class="sb-item" onclick="show('outreach',this)"><i class="ti ti-mail" style="font-size:14px"></i>Templates</div>
+      <div class="sb-section" style="margin-top:8px">Setup</div>
+      <div class="sb-item" onclick="show('deploy',this)"><i class="ti ti-rocket" style="font-size:14px"></i>Deploy to Vercel</div>
+
+      <div class="icp-box">
+        <div class="icp-title">Your ICP</div>
+        £5M–£200M revenue<br>
+        Courier · Logistics · Ecomm<br>
+        Lean board (2–5 dirs)<br>
+        UK-based · Private limited
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ══ LIVE SEARCH ══ -->
+      <div class="panel active" id="panel-search">
+        <div class="search-card">
+          <div style="font-size:16px;font-weight:600;color:var(--t1);margin-bottom:4px;font-family:'Space Grotesk',sans-serif">Companies House live search</div>
+          <div style="font-size:12px;color:var(--t2);margin-bottom:14px">Queries the real API, scores results against your ICP, and surfaces the best leads.</div>
+          <div class="search-row">
+            <input class="search-input" id="searchQ" placeholder="e.g. courier, last-mile, ecommerce logistics..." value="courier">
+            <select class="search-sel" id="searchSic">
+              <option value="">All SIC codes</option>
+              <option value="53200">53200 — Courier</option>
+              <option value="49410">49410 — Road freight</option>
+              <option value="52290">52290 — Transport support</option>
+              <option value="52100">52100 — Warehousing</option>
+              <option value="47910">47910 — Ecommerce/mail order</option>
+              <option value="49320">49320 — Taxi/private hire</option>
+            </select>
+            <select class="search-sel" id="maxRes">
+              <option value="20">20 results</option>
+              <option value="40">40 results</option>
+              <option value="80">80 results</option>
+            </select>
+            <button class="btn btn-gold" onclick="runSearch()"><i class="ti ti-search"></i>Search</button>
+          </div>
+          <div class="chips" id="quickChips">
+            <div class="chip on" onclick="setQ('courier',this)">Courier</div>
+            <div class="chip" onclick="setQ('last mile logistics',this)">Last-mile</div>
+            <div class="chip" onclick="setQ('ecommerce fulfilment',this)">Ecomm fulfilment</div>
+            <div class="chip" onclick="setQ('freight logistics',this)">Freight</div>
+            <div class="chip" onclick="setQ('3pl warehousing',this)">3PL</div>
+            <div class="chip" onclick="setQ('same day delivery',this)">Same-day</div>
+          </div>
+        </div>
+
+        <div class="status-bar" id="searchStatus" style="display:none">
+          <div class="dot dot-amber" id="sDot"></div>
+          <div class="progress"><div class="progress-fill" id="sProgress" style="width:0%"></div></div>
+          <span id="sText" style="white-space:nowrap;font-size:12px">Searching...</span>
+        </div>
+
+        <div id="searchResults"></div>
+      </div>
+
+      <!-- ══ HOT LEADS ══ -->
+      <div class="panel" id="panel-leads">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-lbl">Total found</div><div class="stat-val" id="st-total">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Score A+</div><div class="stat-val up" id="st-aplus">0</div><div class="stat-sub">Contact now</div></div>
+          <div class="stat-card"><div class="stat-lbl">Score A</div><div class="stat-val warn" id="st-a">0</div></div>
+          <div class="stat-card"><div class="stat-lbl">Score B</div><div class="stat-val" id="st-b">0</div><div class="stat-sub">Nurture</div></div>
+        </div>
+        <div style="font-size:16px;font-weight:600;color:var(--t1);margin-bottom:12px;font-family:'Space Grotesk',sans-serif">All scored leads</div>
+        <div id="leadsTable"><div style="font-size:13px;color:var(--t2);padding:24px 0">Run a search first — results will appear here.</div></div>
+      </div>
+
+      <!-- ══ CILT IMPORT ══ -->
+      <div class="panel" id="panel-cilt">
+        <div style="font-size:16px;font-weight:600;color:var(--t1);margin-bottom:4px;font-family:'Space Grotesk',sans-serif">CILT SME CSV import</div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:16px">Upload your CILT member list. The agent fuzzy-matches it against Companies House results and boosts scores.</div>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
+          ondragover="event.preventDefault();this.classList.add('over')"
+          ondragleave="this.classList.remove('over')"
+          ondrop="handleDrop(event)">
+          <i class="ti ti-upload" style="font-size:28px;color:var(--t3)"></i>
+          <div style="font-size:13px;font-weight:500;color:var(--t2);margin:8px 0 4px">Drop CILT CSV here or click to browse</div>
+          <div style="font-size:11px;color:var(--t3)">Columns: company_name, member_year, sector, contact_name, contact_role (optional)</div>
+          <input type="file" id="fileInput" accept=".csv" style="display:none" onchange="handleFile(this.files[0])">
+        </div>
+        <div id="ciltStatus" style="margin-top:16px"></div>
+      </div>
+
+      <!-- ══ OUTREACH ══ -->
+      <div class="panel" id="panel-outreach">
+        <div style="font-size:16px;font-weight:600;color:var(--t1);margin-bottom:4px;font-family:'Space Grotesk',sans-serif">Outreach templates</div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:16px">Edit inline — all fields in <span style="color:var(--gold)">gold</span> are personalisation tokens.</div>
+
+        <div class="outreach-card">
+          <div class="oc-label">LinkedIn connection note · Fractional COO/CTO</div>
+          <div class="oc-title">No-pitch warm intro</div>
+          <textarea class="editable">Hi [First name] — I noticed [Company] has been growing quickly since [year/trigger event]. That kind of growth usually brings some interesting operational complexity. I work fractionally with logistics and ecommerce businesses at the £[X]m–£[Y]m stage — not pitching, just thought your story was worth following. Happy to connect.</textarea>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-ghost btn-sm" onclick="copyTextarea(this)"><i class="ti ti-copy"></i>Copy</button>
+          </div>
+        </div>
+
+        <div class="outreach-card">
+          <div class="oc-label">First email · Transformation framing</div>
+          <div class="oc-title">The "£Xm gap" hook</div>
+          <textarea class="editable">Subject: [Company] — quick ops question
+
+Hi [Name],
+
+I've been following [Company] — impressive what you've built. At the £[X]m–£[Y]m stage, most courier/logistics businesses hit the same inflection point: the systems and team that got you here aren't quite the ones to get you to [next milestone].
+
+I work fractionally with founders and lean boards — typically 2–3 days a week — to navigate exactly that transition. Recent work includes [brief relevant example].
+
+Worth a 20-minute call to see if there's anything useful I could offer? No deck, no hard sell.
+
+[Your name]
+VirtualCrew.co.uk</textarea>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-ghost btn-sm" onclick="copyTextarea(this)"><i class="ti ti-copy"></i>Copy</button>
+          </div>
+        </div>
+
+        <div class="outreach-card">
+          <div class="oc-label">CILT member hook</div>
+          <div class="oc-title">Shared professional context</div>
+          <textarea class="editable">Hi [Name] — I spotted [Company] on the CILT SME member list. Great to see more logistics businesses taking that seriously. I work fractionally with companies at your stage — usually stepping in where a full-time hire isn't quite right yet but the challenge is real. Happy to connect — no agenda.</textarea>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-ghost btn-sm" onclick="copyTextarea(this)"><i class="ti ti-copy"></i>Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ DEPLOY GUIDE ══ -->
+      <div class="panel" id="panel-deploy">
+        <div style="font-size:16px;font-weight:600;color:var(--t1);margin-bottom:4px;font-family:'Space Grotesk',sans-serif">Deploy to Vercel</div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:20px">Live in under 5 minutes. Your Companies House API key stays secret server-side.</div>
+
+        <div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:10px">1 — Install Vercel CLI and push your code</div>
+        <div class="step-row"><div class="step-num">1</div><div class="step-body">Install Node.js (v18+) if not already: <a href="https://nodejs.org" target="_blank" style="color:var(--blue)">nodejs.org</a></div></div>
+        <pre>npm install -g vercel</pre>
+        <div class="step-row"><div class="step-num">2</div><div class="step-body">Create a GitHub repo called <strong>virtualcrew-lead-agent</strong> and push the downloaded project folder.</div></div>
+        <pre>git init
+git add .
+git commit -m "Initial VirtualCrew lead agent"
+git remote add origin https://github.com/YOURNAME/virtualcrew-lead-agent.git
+git push -u origin main</pre>
+
+        <div style="font-size:13px;font-weight:600;color:var(--t1);margin:16px 0 10px">2 — Connect to Vercel</div>
+        <div class="step-row"><div class="step-num">3</div><div class="step-body">Go to <a href="https://vercel.com" target="_blank" style="color:var(--blue)">vercel.com</a> → <strong>Add New Project</strong> → import your GitHub repo. Vercel auto-detects the project. Click <strong>Deploy</strong>.</div></div>
+
+        <div style="font-size:13px;font-weight:600;color:var(--t1);margin:16px 0 10px">3 — Add your Companies House API key</div>
+        <div class="step-row"><div class="step-num">4</div><div class="step-body">In your Vercel project → <strong>Settings → Environment Variables</strong>. Add:</div></div>
+        <pre>Name:   CH_API_KEY
+Value:  (paste your key from Companies House developer portal)
+Env:    Production + Preview</pre>
+        <div class="step-row"><div class="step-num">5</div><div class="step-body">Click <strong>Save</strong>, then <strong>Redeploy</strong>. Your key is now securely server-side — never in the browser.</div></div>
+
+        <div style="font-size:13px;font-weight:600;color:var(--t1);margin:16px 0 10px">4 — Add your custom domain (optional)</div>
+        <div class="step-row"><div class="step-num">6</div><div class="step-body">In Vercel → <strong>Settings → Domains</strong> → add <strong>leads.virtualcrew.co.uk</strong>. Then add a CNAME record in your DNS:<br><br>
+          <code>leads  CNAME  cname.vercel-dns.com</code><br><br>
+          Live in 2–5 minutes.</div></div>
+
+        <div style="font-size:13px;font-weight:600;color:var(--t1);margin:16px 0 10px">5 — How it works in production</div>
+        <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--t2);line-height:1.75">
+          Browser → <code>/api/search?q=courier</code> → Vercel serverless function → Companies House API (with secret key) → scored JSON → browser renders results.<br><br>
+          Your CH API key is <strong style="color:var(--t1)">never</strong> sent to the browser. Vercel injects it server-side at runtime. Free tier gives you 100GB bandwidth and 1M function invocations/month — more than enough.
+        </div>
+
+        <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+          <a href="https://vercel.com/new" target="_blank" class="btn btn-gold"><i class="ti ti-rocket"></i>Open Vercel</a>
+          <a href="https://find-and-update.company-information.service.gov.uk" target="_blank" class="btn btn-ghost"><i class="ti ti-key"></i>Get CH API key</a>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /body -->
+</div><!-- /shell -->
+
+<script>
+// ── STATE ──
+let allResults = [];
+let ciltData = [];
+let openRow = null;
+
+// ── NAV ──
+function show(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+}
+
+function setQ(q, el) {
+  document.getElementById('searchQ').value = q;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// ── LIVE SEARCH ──
+async function runSearch() {
+  const q = document.getElementById('searchQ').value.trim() || 'courier';
+  const sic = document.getElementById('searchSic').value;
+  const max = document.getElementById('maxRes').value;
+
+  const statusBar = document.getElementById('searchStatus');
+  const dot = document.getElementById('sDot');
+  const prog = document.getElementById('sProgress');
+  const txt = document.getElementById('sText');
+  const resultsEl = document.getElementById('searchResults');
+
+  statusBar.style.display = 'flex';
+  dot.className = 'dot dot-amber';
+  prog.style.width = '10%';
+  txt.textContent = 'Querying Companies House API...';
+  resultsEl.innerHTML = '';
+
+  try {
+    prog.style.width = '40%';
+    let url = `/api/search?q=${encodeURIComponent(q)}&maxResults=${max}`;
+    if (sic) url += `&sic=${sic}`;
+
+    const res = await fetch(url);
+    prog.style.width = '75%';
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    prog.style.width = '100%';
+    dot.className = 'dot dot-green';
+    txt.textContent = `${data.returned} companies scored · ${data.total_found?.toLocaleString() || '?'} total on Companies House`;
+
+    allResults = data.results || [];
+    renderResults(allResults, resultsEl);
+    updateLeadsPanel();
+  } catch (err) {
+    dot.className = 'dot dot-red';
+    txt.textContent = 'Error: ' + err.message;
+    prog.style.width = '100%';
+
+    // Show demo data if API not yet configured
+    if (err.message.includes('CH_API_KEY') || err.message.includes('fetch')) {
+      txt.textContent = 'API key not yet configured — showing demo data';
+      allResults = getDemoResults();
+      renderResults(allResults, resultsEl);
+      updateLeadsPanel();
+    }
+  }
+}
+
+function scoreClass(g) {
+  return g === 'A+' ? 'score-aplus' : g === 'A' ? 'score-a' : g === 'B' ? 'score-b' : 'score-c';
+}
+
+function renderResults(results, container) {
+  if (!results.length) { container.innerHTML = '<div style="font-size:13px;color:var(--t2);padding:24px">No results found — try a different search term.</div>'; return; }
+
+  const sorted = [...results].sort((a, b) => b.score - a.score);
+  let html = `
+    <div class="results-wrap">
+      <div class="results-header">
+        <span>Company</span><span>Location</span><span>Directors</span><span>SIC codes</span><span>Signals</span><span>Score</span>
+      </div>`;
+
+  sorted.forEach((r, i) => {
+    const sics = (r.sic_codes || []).slice(0, 2).map(s => `<span class="tag tag-gray" style="font-size:9px">${s}</span>`).join(' ');
+    const sigs = (r.signals || []).slice(0, 2).map(s => `<div style="font-size:10px;color:var(--t2)">${s}</div>`).join('');
+    html += `
+      <div>
+        <div class="result-row" onclick="toggleExpand(${i})">
+          <div>
+            <div class="co-name">${r.name || '—'}</div>
+            <div class="co-sub">${r.incorporated ? 'Inc. ' + r.incorporated.substring(0,4) : ''}</div>
+          </div>
+          <div style="font-size:12px;color:var(--t2)">${r.location || '—'}</div>
+          <div style="font-size:13px;color:var(--t1)">${r.directors ?? '—'}</div>
+          <div>${sics}</div>
+          <div>${sigs}</div>
+          <div style="display:flex;justify-content:center">
+            <div class="score-ring ${scoreClass(r.grade)}">${r.grade}</div>
+          </div>
+        </div>
+        <div class="expand-panel" id="ep-${i}">
+          <div>
+            <div class="ep-title">Company details</div>
+            <div class="ep-row">Status <span>${r.status || '—'}</span></div>
+            <div class="ep-row">Incorporated <span>${r.incorporated || '—'}</span></div>
+            <div class="ep-row">Company no. <span>${r.company_number || '—'}</span></div>
+            <div class="ep-row">ICP score <span>${r.score || 0} pts</span></div>
+            <a href="${r.ch_url}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);margin-top:8px;text-decoration:none"><i class="ti ti-external-link" style="font-size:12px"></i>View on Companies House</a>
+          </div>
+          <div>
+            <div class="ep-title">ICP signals</div>
+            <div class="signal-list">${(r.signals || []).map(s => `<div class="signal-item">${s}</div>`).join('') || '<div style="font-size:12px;color:var(--t3)">No signals</div>'}</div>
+          </div>
+          <div>
+            <div class="ep-title">Active directors</div>
+            ${(r.active_directors || []).map(d => `<div class="ep-row">${d.name.split(',').reverse().join(' ').trim()} <span>Dir.</span></div>`).join('') || '<div style="font-size:12px;color:var(--t3)">Not available</div>'}
+            <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">
+              <button class="btn btn-gold btn-sm" onclick="draftOutreach('${(r.name||'').replace(/'/g,"\\'")}')"><i class="ti ti-send"></i>Draft outreach</button>
+              <button class="btn btn-ghost btn-sm" onclick="addToLeads(${i})"><i class="ti ti-plus"></i>Add to leads</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function toggleExpand(i) {
+  const ep = document.getElementById('ep-' + i);
+  const isOpen = ep.classList.contains('open');
+  document.querySelectorAll('.expand-panel').forEach(e => e.classList.remove('open'));
+  if (!isOpen) ep.classList.add('open');
+}
+
+function updateLeadsPanel() {
+  document.getElementById('leadCount').textContent = allResults.length;
+  document.getElementById('st-total').textContent = allResults.length;
+  document.getElementById('st-aplus').textContent = allResults.filter(r => r.grade === 'A+').length;
+  document.getElementById('st-a').textContent = allResults.filter(r => r.grade === 'A').length;
+  document.getElementById('st-b').textContent = allResults.filter(r => r.grade === 'B').length;
+  renderResults(allResults, document.getElementById('leadsTable'));
+}
+
+function addToLeads(i) {
+  show('leads', document.querySelector('.sb-item:nth-child(3)'));
+}
+
+function draftOutreach(name) {
+  show('outreach', null);
+  const ta = document.querySelectorAll('textarea.editable')[0];
+  ta.value = ta.value.replace('[Company]', name).replace('[Company]', name);
+}
+
+function copyTextarea(btn) {
+  const ta = btn.closest('.outreach-card').querySelector('textarea');
+  navigator.clipboard.writeText(ta.value).then(() => {
+    btn.innerHTML = '<i class="ti ti-check"></i>Copied!';
+    setTimeout(() => btn.innerHTML = '<i class="ti ti-copy"></i>Copy', 2000);
+  });
+}
+
+// ── CILT CSV IMPORT ──
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('over');
+  handleFile(e.dataTransfer.files[0]);
+}
+
+function handleFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const rows = parseCSV(e.target.result);
+    ciltData = rows;
+    showCiltStatus(rows);
+  };
+  reader.readAsText(file);
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z_]/g,''));
+  return lines.slice(1).map(line => {
+    const vals = line.split(',');
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (vals[i] || '').trim().replace(/^"|"$/g,''));
+    return obj;
+  }).filter(r => r.company_name || r.name || r.organisation);
+}
+
+function showCiltStatus(rows) {
+  const nameKey = Object.keys(rows[0] || {}).find(k => k.includes('name') || k.includes('company') || k.includes('org')) || 'company_name';
+  let matched = 0;
+  rows.forEach(r => {
+    const cName = (r[nameKey] || '').toLowerCase().replace(/\s*(ltd|limited|plc|uk)\s*/g,'').trim();
+    allResults.forEach(ch => {
+      const chName = ch.name.toLowerCase().replace(/\s*(ltd|limited|plc|uk)\s*/g,'').trim();
+      if (chName === cName || chName.includes(cName) || cName.includes(chName)) {
+        matched++; ch.cilt = true; ch.ciltRow = r;
+        if (ch.grade === 'B') ch.grade = 'A';
+        else if (ch.grade === 'A') ch.grade = 'A+';
+      }
+    });
+  });
+
+  document.getElementById('ciltStatus').innerHTML = `
+    <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:16px">
+      <div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:8px">Import complete</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.8">
+        ${rows.length} CILT records imported<br>
+        ${matched} matched with Companies House results (scores boosted)<br>
+        ${rows.length - matched} CILT-only companies (not yet in CH results — try searching them)
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn btn-gold btn-sm" onclick="show('leads',null);updateLeadsPanel()"><i class="ti ti-list"></i>View enriched leads</button>
+      </div>
+    </div>`;
+}
+
+// ── DEMO DATA (shown when API not yet configured) ──
+function getDemoResults() {
+  return [
+    {company_number:'07123456',name:'Speedy Freight Ltd',status:'active',incorporated:'2011-03-14',sic_codes:['53200'],location:'Birmingham, West Midlands',directors:4,active_directors:[{name:'HARTLEY, James'}],score:7,grade:'A+',signals:['SIC match (53200)','Lean board (4 dirs)','Recent accounts','Prime growth age'],ch_url:'https://find-and-update.company-information.service.gov.uk/company/07123456'},
+    {company_number:'09234567',name:'GreenMile Logistics Ltd',status:'active',incorporated:'2015-07-22',sic_codes:['49410'],location:'Manchester, Greater Manchester',directors:3,active_directors:[{name:'OKONKWO, Sarah'}],score:6,grade:'A+',signals:['SIC match (49410)','Lean board (3 dirs)','Recent accounts'],ch_url:'https://find-and-update.company-information.service.gov.uk/company/09234567'},
+    {company_number:'10345678',name:'Parcel Planet UK Ltd',status:'active',incorporated:'2013-11-05',sic_codes:['52290'],location:'Leeds, West Yorkshire',directors:5,active_directors:[{name:'BAINES, Tom'},{name:'SHAW, Rebecca'}],score:5,grade:'A',signals:['SIC match (52290)','Lean board (5 dirs)','Prime growth age'],ch_url:'https://find-and-update.company-information.service.gov.uk/company/10345678'},
+    {company_number:'11456789',name:'SwiftDrop Solutions Ltd',status:'active',incorporated:'2018-02-10',sic_codes:['49410'],location:'Bristol, Avon',directors:2,active_directors:[{name:'CHEN, Wei'}],score:5,grade:'A',signals:['SIC match (49410)','Lean board (2 dirs)','Recent accounts'],ch_url:'https://find-and-update.company-information.service.gov.uk/company/11456789'},
+    {company_number:'08567890',name:'LastMile Express Ltd',status:'active',incorporated:'2009-06-18',sic_codes:['53200'],location:'London, Greater London',directors:4,active_directors:[{name:'PATEL, Nikhil'}],score:4,grade:'B',signals:['SIC match (53200)','Lean board (4 dirs)'],ch_url:'https://find-and-update.company-information.service.gov.uk/company/08567890'},
+    {company_number:'12678901',name:'TradeRoute Freight Ltd',status:'active',incorporated:'2007-09-30',sic_codes:['52100'],location:'Sheffield, South Yorkshire',directors:5,active_directors:[{name:'MORGAN, David'},{name:'PRICE, Susan'}],score:4,grade:'B',signals:['SIC match (52100)','Lean board (5 dirs)'],ch_url:'https://find-and-update.company-information.service.gov.uk/company/12678901'},
+  ];
+}
+
+// Auto-run search on load (will show demo if API not configured)
+window.addEventListener('load', () => runSearch());
+</script>
+</body>
+</html>
