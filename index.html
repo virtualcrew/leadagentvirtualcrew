@@ -782,33 +782,106 @@ function handleShFile(file){
   reader.readAsText(file);
 }
 
-function processShopifyCSV(text){
-  const lines=text.trim().split('\n');
-  const raw=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/[^a-z0-9_]/g,''));
-  const col=kws=>raw.findIndex(h=>kws.some(k=>h.includes(k)));
-  const iDomain=col(['domain','url','website','store']);
-  const iName=col(['name','store_name','company','brand']);
-  const iRev=col(['revenue','rev','gmv','sales']);
-  const iCat=col(['category','sector','niche','industry']);
-  const iLoc=col(['location','country','city','region']);
-  const iEmp=col(['employee','staff','team','size']);
+function parseCSVLine(line) {
+  // Handles quoted fields containing commas — BuiltWith wraps many fields in quotes
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQ && line[i+1] === '"') { cur += '"'; i++; } // escaped quote
+      else inQ = !inQ;
+    } else if (ch === ',' && !inQ) {
+      result.push(cur.trim()); cur = '';
+    } else {
+      cur += ch;
+    }
+  }
+  result.push(cur.trim());
+  return result;
+}
 
-  const stores=lines.slice(1).map(line=>{
-    const vals=line.split(',').map(v=>(v||'').replace(/^"|"$/g,'').trim());
-    const domain=iDomain>=0?vals[iDomain]:'';
-    const name=iName>=0?vals[iName]:domain.replace(/\.(com|co\.uk|io|store)$/,'').replace(/-/g,' ');
-    const revRaw=iRev>=0?vals[iRev]:'';
-    const {min,max,str}=parseRevenue(revRaw);
-    const cat=iCat>=0?vals[iCat]:'';
-    const loc=iLoc>=0?vals[iLoc]:'UK';
-    const grade=scoreShopify(min,max,cat);
-    return {name:titleCase(name),domain,revEstMin:min,revEstMax:max,revStr:str||'Est. £5M–£200M',category:cat,location:loc,grade,score:gradeToScore(grade),signals:shopifySignals(cat,min),_source:'shopify'};
-  }).filter(r=>r.name&&r.domain);
+function processShopifyCSV(text) {
+  // Strip UTF-8 BOM if present (common in BuiltWith exports)
+  const clean = text.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const lines = clean.trim().split('\n').filter(l => l.trim().length > 0);
+  if (lines.length < 2) {
+    document.getElementById('shCsvStatus').innerHTML = '<div class="status-bar"><div class="dot dot-red"></div><span>File appears empty or has only one row — check it opens correctly in a text editor.</span></div>';
+    return;
+  }
 
-  shopifyLeads=stores;
-  showShopifyResults(stores);
-  document.getElementById('shCsvStatus').innerHTML='<div class="status-bar"><div class="dot dot-green"></div><span>'+stores.length+' Shopify stores imported and scored</span></div>';
-  updateShopifyStatus(stores.length);
+  // Parse header — normalise to lowercase, strip special chars
+  const rawHeaders = parseCSVLine(lines[0]);
+  const headers = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').trim());
+
+  // Debug: show detected headers in status while processing
+  document.getElementById('shCsvStatus').innerHTML = '<div class="status-bar"><div class="dot dot-amber"></div><span>Detected '+headers.length+' columns: '+headers.slice(0,6).join(', ')+(headers.length>6?' …':'')+'</span></div>';
+
+  // Column mapping — supports BuiltWith, Store Leads, custom CSVs
+  const col = kws => headers.findIndex(h => kws.some(k => h.includes(k)));
+
+  // BuiltWith Meta Export exact names + common alternatives
+  const iDomain  = col(['domain','url','website','site']);
+  const iName    = col(['company','store name','brand name','name']);
+  const iRev     = col(['sales revenue','revenue','gmv','sales','turnover']);
+  const iCat     = col(['vertical','category','sector','niche','industry']);
+  const iCity    = col(['city','town']);
+  const iState   = col(['state','county','region']);
+  const iCountry = col(['country','location']);
+  const iEmp     = col(['employee','staff','headcount','size']);
+  const iEmail   = col(['email']);
+  const iLinkedIn= col(['linkedin']);
+  const iSpend   = col(['tech spend','spend']);
+
+  let skipped = 0;
+  const stores = lines.slice(1).map(line => {
+    if (!line.trim()) return null;
+    const vals = parseCSVLine(line);
+
+    const domain  = (iDomain  >= 0 ? vals[iDomain]  : '').replace(/^https?:\/\//,'').replace(/\//,'').trim();
+    const rawName  = iName    >= 0 ? vals[iName]    : '';
+    const name     = rawName || titleCase(domain.replace(/\.(com|co\.uk|io|store|net|org)$/,'').replace(/[-_.]/g,' '));
+    const revRaw   = iRev     >= 0 ? vals[iRev]     : '';
+    const city     = iCity    >= 0 ? vals[iCity]    : '';
+    const state    = iState   >= 0 ? vals[iState]   : '';
+    const country  = iCountry >= 0 ? vals[iCountry] : '';
+    const location = [city, state, country].filter(Boolean).join(', ') || 'UK';
+    const cat      = iCat     >= 0 ? vals[iCat]     : '';
+    const email    = iEmail   >= 0 ? vals[iEmail]   : '';
+    const linkedin = iLinkedIn>= 0 ? vals[iLinkedIn]: '';
+
+    if (!domain && !name) { skipped++; return null; }
+
+    // BuiltWith revenue is in USD — convert ~0.79 to GBP, then to millions
+    const {min, max, str} = parseRevenue(revRaw, true);
+
+    const grade = scoreShopify(min, max, cat);
+    const signals = shopifySignals(cat, min, iEmp >= 0 ? vals[iEmp] : '');
+
+    return {
+      name: titleCase(name), domain, revEstMin: min, revEstMax: max,
+      revStr: str || 'Est. pending', category: cat, location,
+      email, linkedin, grade, score: gradeToScore(grade), signals,
+      _source: 'shopify'
+    };
+  }).filter(Boolean);
+
+  if (!stores.length) {
+    document.getElementById('shCsvStatus').innerHTML = '<div class="status-bar"><div class="dot dot-red"></div><span>No valid rows found. Headers detected: <strong>'+headers.slice(0,8).join(', ')+'</strong>. Make sure the CSV has a Domain or Company column.</span></div>';
+    return;
+  }
+
+  // Filter to ICP range (£5M–£200M) — keep unknowns for manual review
+  const inRange  = stores.filter(s => s.grade !== 'C');
+  const outRange = stores.filter(s => s.grade === 'C');
+
+  shopifyLeads = inRange;
+  showShopifyResults(inRange);
+  const msg = inRange.length + ' stores in ICP range (£5M–£200M)'
+    + (outRange.length ? ' · ' + outRange.length + ' outside range hidden' : '')
+    + (skipped ? ' · ' + skipped + ' blank rows skipped' : '');
+  document.getElementById('shCsvStatus').innerHTML = '<div class="status-bar"><div class="dot dot-green"></div><span>' + msg + '</span></div>';
+  updateShopifyStatus(inRange.length);
   updateCounts(); updateDashboard();
 }
 
@@ -842,19 +915,31 @@ function enrichURLs(){
   },800);
 }
 
-function parseRevenue(raw){
-  if (!raw) return {min:0,max:999,str:''};
-  const clean=raw.replace(/[£$,\s]/g,'').toLowerCase();
-  const m=clean.match(/(\d+\.?\d*)([km]?).*?(\d+\.?\d*)([km]?)/);
-  if (m){
-    const scale=s=>s==='k'?0.001:s==='m'?1:1;
-    const min=parseFloat(m[1])*scale(m[2]);
-    const max=parseFloat(m[3])*scale(m[4]);
-    return {min,max,str:'£'+m[1]+(m[2]||'')+'–£'+m[3]+(m[4]||'')};
+function parseRevenue(raw, isUSD) {
+  if (!raw || raw.trim()==='' || raw.trim()==='0') return {min:0,max:999,str:''};
+  const R = 0.79; // USD to GBP
+  const s = raw.replace(/[$,\s]/g,'').replace(/\u00a3/g,'').toLowerCase();
+  // Plain integer — BuiltWith exports raw USD e.g. "1234567"
+  if (/^\d+$/.test(s)) {
+    let usd = parseInt(s,10);
+    if (usd > 10000000000) usd /= 100; // cents to dollars
+    const gbpM = (usd * R) / 1000000;
+    if (gbpM < 0.5) return {min:0,max:2,str:'<£1M'};
+    const lo=Math.round(gbpM*0.8*10)/10, hi=Math.round(gbpM*1.2*10)/10;
+    return {min:lo, max:hi, str:'~£'+gbpM.toFixed(1)+'M'};
   }
-  const single=clean.match(/(\d+\.?\d*)([km]?)/);
-  if (single){const v=parseFloat(single[1])*(single[2]==='k'?0.001:single[2]==='m'?1:1);return {min:v*0.7,max:v*1.3,str:'~£'+single[1]+(single[2]||'')}}
-  return {min:0,max:999,str:raw};
+  // Range: "5m-20m" or "5000000-20000000"
+  const m=s.match(/(\d+\.?\d*)([km]?)[-– ]+(\d+\.?\d*)([km]?)/);
+  if (m) {
+    const sc=x=>x==='k'?0.001:x==='m'?1:1;
+    let lo=parseFloat(m[1])*sc(m[2]), hi=parseFloat(m[3])*sc(m[4]);
+    if (isUSD){lo*=R;hi*=R;}
+    return {min:lo,max:hi,str:'~£'+lo.toFixed(1)+'M-£'+hi.toFixed(1)+'M'};
+  }
+  // Single: "5m"
+  const sg=s.match(/(\d+\.?\d*)([km]?)/);
+  if (sg){let v=parseFloat(sg[1])*(sg[2]==='k'?0.001:sg[2]==='m'?1:1);if(isUSD)v*=R;return {min:v*0.7,max:v*1.3,str:'~£'+v.toFixed(1)+'M'};}
+  return {min:0,max:999,str:''};
 }
 
 function scoreShopify(min,max,cat){
@@ -864,11 +949,13 @@ function scoreShopify(min,max,cat){
   return 'B';
 }
 function gradeToScore(g){return g==='A+'?6:g==='A'?4:g==='B'?2:0}
-function shopifySignals(cat,min){
+function shopifySignals(cat,min,emp){
   const s=['Shopify platform'];
-  if (cat) s.push(cat+' sector');
-  if (min>=10) s.push('Revenue in ICP range');
-  s.push('D2C / ecommerce ops fit');
+  if (cat && cat.trim()) s.push(cat+' sector');
+  if (min>=25&&min<200) s.push('Revenue in ICP sweet spot');
+  else if (min>=5) s.push('Revenue in ICP range');
+  if (emp && parseInt(emp)>10 && parseInt(emp)<500) s.push('Team size: '+emp+' employees');
+  s.push('D2C / ecomm ops fit');
   return s;
 }
 function titleCase(s){return s.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ')}
