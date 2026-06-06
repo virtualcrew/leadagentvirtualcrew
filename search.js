@@ -1,4 +1,4 @@
-const CH_BASE = "https://api.companieshouse.gov.uk";
+const CH_BASE = "https://api.company-information.service.gov.uk";
 
 const SIC_SCORES = {
   "53200": 3,
